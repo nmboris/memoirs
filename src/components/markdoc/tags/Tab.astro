@@ -1,0 +1,92 @@
+---
+export const tab = {
+	render: "Tab",
+	attributes: {
+		id: {
+			type: Number,
+		},
+		label: {
+			type: String,
+		},
+	},
+};
+
+const { id, label } = Astro.props;
+console.log(":: id, label", id, label);
+
+const myId = Number(id);
+// Tab HTML/CSS Src: https://codepen.io/alvarotrigo/pen/bGoPzmw?editors=1100
+---
+
+<input
+	class="input"
+	name="tabs"
+	type="radio"
+	id={`tab-${id}`}
+	checked={1 === myId}
+/>
+<label class="label" for={`tab-${id}`}>
+	{label}
+</label>
+<div class="panel">
+	<slot />
+</div>
+
+<style>
+	.input {
+		position: absolute;
+		opacity: 0;
+	}
+
+	.label {
+		width: 100%;
+		padding: 20px 30px;
+		background: #e5e5e5;
+		cursor: pointer;
+		font-weight: bold;
+		font-size: 18px;
+		color: #7f7f7f;
+		transition:
+			background 0.1s,
+			color 0.1s;
+	}
+
+	.label:hover {
+		background: #d8d8d8;
+	}
+
+	.label:active {
+		background: #ccc;
+	}
+
+	.input:focus + .label {
+		z-index: 1;
+	}
+
+	.input:checked + .label {
+		background: #fff;
+		color: #000;
+	}
+
+	.panel {
+		display: none;
+		padding: 20px 30px 30px;
+		background: #fff;
+		height: 360px;
+		width: var(--tab-width);
+	}
+
+	@media (min-width: 600px) {
+		.label {
+			width: auto;
+		}
+
+		.panel {
+			order: 99;
+		}
+	}
+
+	.input:checked + .label + .panel {
+		display: block;
+	}
+</style>

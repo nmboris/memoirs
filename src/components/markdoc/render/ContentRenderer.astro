@@ -3,6 +3,8 @@
 import Markdoc, { type Config } from "@markdoc/markdoc";
 import MarkdocRenderer from "./MarkdocRenderer.astro";
 
+import type { MemoWithMeta } from "@lib/types";
+
 // Markdoc Components Imports
 import Button, { button } from "../tags/Button.astro";
 import MemoTag, { memoTag } from "../tags/MemoTag.astro";
@@ -11,7 +13,8 @@ import CodeBlock, { codeblock } from "../tags/CodeBlock.astro";
 import Grid, { grid } from "../tags/Grid.astro";
 import GridItem, { griditem } from "../tags/GridItem.astro";
 import SearchBox, { searchbox } from "../tags/SearchBox.astro";
-import type { MemoWithMeta } from "@lib/types";
+import Tabs, { tabs } from "../tags/Tabs.astro";
+import Tab, { tab } from "../tags/Tab.astro";
 
 type Props = {
 	doc: MemoWithMeta;
@@ -68,6 +71,8 @@ const markdocConfig: Config = {
 		grid,
 		griditem,
 		searchbox,
+		tabs,
+		tab,
 	},
 	variables: {
 		frontmatter: doc.frontmatter || [],
@@ -108,6 +113,14 @@ const components = {
 	},
 	SearchBox: {
 		Component: SearchBox,
+		props: {},
+	},
+	Tabs: {
+		Component: Tabs,
+		props: {},
+	},
+	Tab: {
+		Component: Tab,
 		props: {},
 	},
 };
