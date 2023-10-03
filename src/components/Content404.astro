@@ -27,14 +27,19 @@ const { pageName, error } = Astro.props;
 
 {
 	!error && (
-		<>
+		<div class="missingMemo">
 			<h1>🧑‍🚀 Hello, Memoirs!</h1>
 
 			<Badge style="margin-bottom: var(--space-8);" multiline error>
+				<p>Unfortunately we couldn't find any content for this page.</p>
+				<ul>
+					<li>Did you create a corresponding memo?</li>
+					<li>Did you set the memo's visibility state to PUBLIC?</li>
+				</ul>
+				<p />
 				<p>
-					Unfortunately we couldn't find any content for this page. Please
-					create a note in your memo instance with at least the following
-					Frontmatter information:
+					If you don't have a memo for this page, create a memo in your memos
+					instance with at least the following Frontmatter information:
 				</p>
 			</Badge>
 			<Prism
@@ -47,13 +52,18 @@ title: ...Enter your page title here...
 This is the content of your page. You can use Markdown here.`}
 				lang="md"
 			/>
-		</>
+		</div>
 	)
 }
 
 <style>
-	p {
-		font-size: var(--default-font-size);
+	p,
+	li {
+		font-size: 16px;
+	}
+
+	li {
+		margin-left: 1.6rem;
 	}
 
 	.error {
@@ -65,6 +75,12 @@ This is the content of your page. You can use Markdown here.`}
 			padding: 1rem;
 			background: #fdd;
 			border: 1px solid #f00;
+		}
+	}
+
+	@media (max-width: 720px) {
+		.missingMemo {
+			padding-inline: 1rem;
 		}
 	}
 </style>
