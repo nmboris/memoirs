@@ -1,0 +1,246 @@
+---
+import BadgeLink from "@components/BadgeLink.astro";
+import Content404 from "@components/Content404.astro";
+import ContentRenderer from "@components/markdoc/render/ContentRenderer.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { getMemoServerCfg } from "@lib/apiHelper";
+import { parseMarkdoc, resolveRelations } from "@lib/markdocHelpers";
+import type {
+	APIMemoResponse,
+	MemoWithMeta,
+	MemosHost,
+	ResolvedRelation,
+} from "@lib/types";
+
+import { GET } from "@api/memo/[memoId].ts";
+
+const { id } = Astro.params;
+
+const memoHostData = Astro.cookies
+	.get("memoirs.memos.host")!
+	.json() as MemosHost; // Set in middleware
+
+const { MemosSourceUrl, MemosAssetUrl, LocalSingleMemoApiUrl } =
+	getMemoServerCfg(Astro.url.origin, memoHostData);
+const baseProps = { title: "Homepage", description: "Welcome to my homepage" };
+
+const localDateOptions: Intl.DateTimeFormatOptions = {
+	weekday: "long",
+	year: "numeric",
+	month: "long",
+	day: "numeric",
+};
+
+const localDateOptionsMobile: Intl.DateTimeFormatOptions = {
+	year: "numeric",
+	month: "long",
+	day: "numeric",
+};
+
+let error: Error | null = null;
+let markdocMemo: MemoWithMeta | null = null;
+let relations: ResolvedRelation[] = [];
+
+try {
+	Astro.params.memoId = id;
+
+	// TODO: The following GET error is an Astro specific probleme,
+	// see https://github.com/withastro/astro/issues/8514
+	// @ts-ignore
+	const memoResp = (await GET(Astro)) as Response;
+	const memoResult = (await memoResp.json()) as APIMemoResponse;
+
+	markdocMemo = parseMarkdoc(MemosAssetUrl, memoResult.data);
+	relations = await resolveRelations(
+		LocalSingleMemoApiUrl,
+		MemosAssetUrl,
+		markdocMemo.relationList
+	);
+} catch (e) {
+	console.error(e);
+	error = e as Error;
+}
+---
+
+<BaseLayout {...baseProps}>
+	<main>
+		<section>
+			{error && <Content404 pageName={""} {error} />}
+			{
+				markdocMemo && (
+					<div class="content">
+						<h1>{markdocMemo.title}</h1>
+						<div class="metadata">
+							<div>
+								{markdocMemo.creatorName}
+								<svg
+									stroke="currentColor"
+									fill="currentColor"
+									stroke-width="0"
+									viewBox="0 0 24 24"
+									xmlns="http://www.w3.org/2000/svg"
+								>
+									<>
+										<path d="M19 4h-3V2h-2v2h-4V2H8v2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zM5 20V7h14V6l.002 14H5z" />
+										<path d="m15.628 12.183-1.8-1.799 1.37-1.371 1.8 1.799zm-7.623 4.018V18h1.799l4.976-4.97-1.799-1.799z" />
+									</>
+								</svg>
+								<span class="showDesktop">
+									{new Date(markdocMemo.updatedTs * 1000).toLocaleDateString(
+										undefined,
+										localDateOptions
+									)}
+								</span>
+								<span class="showMobile">
+									{new Date(markdocMemo.updatedTs * 1000).toLocaleDateString(
+										undefined,
+										localDateOptionsMobile
+									)}
+								</span>
+							</div>
+						</div>
+						<div class="hero-image">
+							{markdocMemo.imageUrl ? (
+								<img src={markdocMemo.imageUrl} alt="Hero" />
+							) : (
+								<hr />
+							)}
+						</div>
+
+						<BadgeLink
+							style="margin-inline: auto; margin-bottom: var(--space-8);"
+							text="Visit memos' source page →"
+							href={`${MemosSourceUrl}/${markdocMemo.id}`}
+						/>
+
+						<ContentRenderer doc={markdocMemo} />
+
+						{markdocMemo.resourceList?.length > 0 && (
+							<div style="padding-top: var(--space-8);">
+								<em>Attachments</em>
+							</div>
+						)}
+						{markdocMemo.resourceList?.map((resource) => {
+							return (
+								<div class="ref">
+									<a target="_blank" href={`${MemosAssetUrl}/${resource.id}`}>
+										{resource.filename}
+									</a>
+								</div>
+							);
+						})}
+						{relations?.length > 0 && (
+							<>
+								<hr />
+								<em>Related Content</em>
+							</>
+						)}
+						{relations?.map((relation) => {
+							return (
+								<div class="ref">
+									<a href={`/memo/${relation?.relatedMemoId}`}>
+										{relation?.title}
+									</a>
+								</div>
+							);
+						})}
+					</div>
+				)
+			}
+		</section>
+	</main>
+</BaseLayout>
+
+<style>
+	hr {
+		width: 60%;
+		background-color: var(--color-text-2);
+		height: 1px;
+		border: none;
+		margin: var(--space-8) auto;
+	}
+
+	section {
+		max-width: 65ch;
+	}
+
+	.showDesktop {
+		@media (max-width: 720px) {
+			display: none;
+		}
+	}
+
+	.showMobile {
+		@media (min-width: 720px) {
+			display: none;
+		}
+	}
+
+	svg {
+		margin-left: var(--space-4);
+		height: calc(1.4 * var(--font-size-paragraph));
+	}
+
+	.content {
+		max-width: var(--content-width);
+		margin-inline: auto;
+	}
+
+	:global(p) {
+		margin-bottom: var(--space-4);
+	}
+
+	:global(li) {
+		margin-left: 2rem; /* TODO: Why doesn't it work with var(--space-4); */
+		padding-left: 0.5rem; /* TODO: Why doesn't it work with var(--space-4); */
+	}
+
+	:global(li:last-child) {
+		margin-bottom: var(--space-4);
+	}
+
+	h1 {
+		margin-bottom: var(--space-4);
+	}
+
+	.metadata {
+		display: grid;
+		grid-auto-flow: column;
+		place-items: center;
+
+		color: var(--color-text-2);
+		font-size: calc(0.8 * var(--font-size-paragraph));
+		margin-bottom: var(--space-4);
+
+		& div {
+			padding: 0;
+			margin: 0;
+			display: flex;
+			align-items: center;
+			gap: var(--space-2);
+		}
+	}
+
+	.hero-image {
+		max-width: 100%;
+
+		& img {
+			width: 100%;
+			height: var(--hero-image-height);
+			object-fit: cover;
+			margin-bottom: var(--space-1);
+
+			border-radius: var(--radius);
+		}
+	}
+
+	@media (max-width: 720px) {
+		main {
+			padding-inline: var(--space-4);
+		}
+
+		section {
+			padding-block: var(--space-1);
+		}
+	}
+</style>

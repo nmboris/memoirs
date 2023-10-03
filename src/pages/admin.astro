@@ -1,0 +1,72 @@
+---
+import PageLayout from "@layouts/BaseLayout.astro";
+import { getMemoServerCfg } from "@lib/apiHelper";
+import type { MemosHost } from "@lib/types";
+
+const pageProps = {
+	title: "Change Server",
+	description: "The form to change to memo server",
+};
+
+const memoHostData = Astro.cookies
+	.get("memoirs.memos.host")!
+	.json() as MemosHost; // Set in middleware
+
+const { host, user } = getMemoServerCfg(Astro.url.origin, memoHostData);
+---
+
+<PageLayout {...pageProps}>
+	<main>
+		<h1>Change Memos Source</h1>
+		<form method="post" action="/api/changeServer">
+			<input
+				type="text"
+				name="host"
+				placeholder="e.g. 'https://demo.usememos.com' or empty for default"
+				value={host}
+			/>
+			<input
+				type="text"
+				name="user"
+				placeholder="e.g. 'memos-demo' or empty for default"
+				value={user}
+			/>
+			<input type="submit" value="Change Server" />
+		</form>
+	</main>
+</PageLayout>
+
+<style>
+	main {
+		display: block;
+		margin-inline: auto;
+	}
+
+	h1 {
+		text-align: center;
+		margin-inline: auto;
+	}
+
+	form {
+		display: grid;
+		grid-auto-flow: row;
+		max-width: 640px;
+		margin-inline: auto;
+		margin-top: 2rem;
+	}
+
+	input {
+		padding: 0.4rem 1rem;
+		margin-bottom: 0.6rem;
+	}
+
+	@media (max-width: 720px) {
+		h1 {
+			font-size: 1.6rem;
+		}
+
+		form {
+			max-width: none;
+		}
+	}
+</style>

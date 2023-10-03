@@ -1,0 +1,8 @@
+---
+import StaticPage from "@layouts/StaticPage.astro";
+
+const baseProps = { title: "Homepage", description: "Welcome to my homepage" };
+const contentName = Astro.url.pathname === "/" ? "index" : Astro.url.pathname;
+---
+
+<StaticPage {baseProps} {contentName} />

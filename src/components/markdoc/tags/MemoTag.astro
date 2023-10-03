@@ -1,0 +1,28 @@
+---
+export const memoTag = {
+	render: "MemoTag",
+	attributes: {
+		tag: {
+			type: String,
+		},
+	},
+};
+
+type Props = {
+	tag?: string;
+};
+
+const { tag } = Astro.props;
+---
+
+<span class="tag" data-tag={tag?.slice(1) || ""}><slot /></span>
+
+<style>
+	.tag {
+		color: white;
+		background-color: #888;
+		padding: 0.1rem 0.2rem;
+		border-radius: 0.25rem;
+		font-size: smaller;
+	}
+</style>

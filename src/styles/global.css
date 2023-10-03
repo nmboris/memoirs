@@ -1,0 +1,114 @@
+@import "./prism-dracula.css";
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	padding: 0;
+	margin: 0;
+}
+
+:root {
+	--color-accent: 341, 78%, 49%;
+	--color-accent-dark: 341, 78%, 42%;
+
+	--color-text-hsl: 0, 0%, 20%;
+	--color-text-2-hsl: 0, 0%, 40%;
+	--color-text: hsl(var(--color-text-hsl));
+	--color-text-2: hsl(var(--color-text-2-hsl));
+	--color-text-invers-hsl: 0, 0%, 93%;
+	--color-text-invers: hsl(var(--color-text-invers-hsl));
+
+	--font-size-paragraph: 1.125rem;
+	--font-size-heading-1: 2.5rem;
+	--font-size-heading-2: 2rem;
+	--font-size-heading-3: 1.5rem;
+	--font-size-heading-4: 1.25rem;
+	--font-size-heading-5: 1.125rem;
+	--font-size-heading-6: 1rem;
+
+	--space-1: 0.25rem;
+	--space-2: 0.5rem;
+	--space-3: 0.75rem;
+	--space-4: 1rem;
+	--space-8: 2rem;
+	--space-16: 4rem;
+
+	--radius: 6px;
+
+	--content-width: 1024px;
+	--hero-image-height: 320px;
+
+	--card-width: 18rem;
+	--card-grid-gap: 1rem;
+}
+
+body {
+	font-family: system-ui, sans-serif;
+	line-height: 1.4;
+	color: var(--color-text);
+	font-size: var(--font-size-paragraph);
+}
+
+.line-clamp {
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+main {
+	max-width: var(--content-width);
+	margin-inline: auto;
+}
+
+section {
+	margin-inline: auto;
+	margin-block: var(--space-16);
+}
+
+article {
+	& img {
+		max-width: 100%;
+	}
+}
+
+p {
+	margin-block: var(--space-4);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-weight: 600;
+}
+
+h1 {
+	font-size: var(--font-size-heading-1);
+	margin-block: var(--space-8);
+}
+
+/* Page Headline */
+.content > h1 {
+	text-align: center;
+}
+
+h2 {
+	font-size: var(--font-size-heading-2);
+}
+
+h3 {
+	font-size: var(--font-size-heading-3);
+}
+h4 {
+	font-size: var(--font-size-heading-4);
+}
+h5 {
+	font-size: var(--font-size-heading-5);
+}
+h6 {
+	font-size: var(--font-size-heading-6);
+}

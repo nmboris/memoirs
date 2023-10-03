@@ -1,0 +1,18 @@
+---
+export const group = {
+	render: "Group",
+	attributes: {
+		items: { type: Array },
+	},
+};
+
+type Props = {
+	items?: unknown[];
+};
+
+const { items } = Astro.props;
+---
+
+<ul>
+	{items?.map((item) => <li>{item}</li>)}
+</ul>

@@ -1,0 +1,28 @@
+---
+import Badge from "./Badge.astro";
+
+type Props = {
+	text: string;
+	href: string;
+	[key: string]: any;
+};
+
+const { text, href, ...restProps } = Astro.props;
+---
+
+<div {...restProps}>
+	<a href={href} type="button" target="_blank">
+		<Badge>{text}</Badge>
+	</a>
+</div>
+
+<style>
+	div {
+		padding-bottom: 0.3rem;
+	}
+
+	a {
+		color: inherit;
+		text-decoration: inherit;
+	}
+</style>

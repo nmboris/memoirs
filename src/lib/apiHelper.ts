@@ -1,0 +1,26 @@
+import type { MemosHost } from "./types";
+
+export const getMemoServerCfg = (
+	myselfOrigin: string,
+	memosHost: MemosHost
+) => {
+	const hostRaw = memosHost.host;
+	const remoteHost = hostRaw.endsWith("/") ? hostRaw.slice(0, -1) : hostRaw;
+	const remoteUser = memosHost.user;
+
+	const MemosApiUrl = `${remoteHost}/api/v1`;
+	const MemosSourceUrl = `${remoteHost}/m`;
+	const MemosAssetUrl = `${remoteHost}/o/r`;
+	const LocalSingleMemoApiUrl = `${myselfOrigin}/api/memo`;
+	const LocalSearchMemosApiUrl = `${myselfOrigin}/api/memos`;
+
+	return {
+		host: remoteHost,
+		user: remoteUser,
+		MemosSourceUrl,
+		MemosApiUrl,
+		MemosAssetUrl,
+		LocalSingleMemoApiUrl,
+		LocalSearchMemosApiUrl,
+	} as MemosHost;
+};

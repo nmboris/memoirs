@@ -1,0 +1,72 @@
+---
+import type {
+	APIMemoQueryResponse,
+	BaseLayoutProps,
+	MemoWithMeta,
+	MemosHost,
+} from "@lib/types";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { parseMarkdoc } from "@lib/markdocHelpers";
+import { getMemoServerCfg } from "@lib/apiHelper";
+import Content404 from "@components/Content404.astro";
+import { GET } from "@api/memos.ts";
+import BadgeLink from "@components/BadgeLink.astro";
+import ContentRenderer from "@components/markdoc/render/ContentRenderer.astro";
+
+type Props = {
+	baseProps: BaseLayoutProps;
+	contentName: string;
+	content?: string;
+};
+
+const { baseProps, contentName } = Astro.props;
+
+const memoHostData = Astro.cookies
+	.get("memoirs.memos.host")!
+	.json() as MemosHost; // Set in middleware
+const { MemosSourceUrl, MemosAssetUrl } = getMemoServerCfg(
+	Astro.url.origin,
+	memoHostData
+);
+
+let error: Error | null = null;
+let myPageMemo: MemoWithMeta | null = null;
+
+try {
+	Astro.props.content = `memoirs_page: ${contentName}`;
+
+	// TODO: The following GET error is an Astro specific probleme,
+	// see https://github.com/withastro/astro/issues/8514
+	// @ts-ignore
+	const memosResp = (await GET(Astro)) as Response;
+	const memosJson = (await memosResp.json()) as APIMemoQueryResponse;
+
+	if (memosJson && memosJson.data.length) {
+		myPageMemo = parseMarkdoc(MemosAssetUrl, memosJson.data[0]);
+	}
+} catch (e) {
+	console.error(e);
+	error = e as Error;
+}
+---
+
+<BaseLayout {...baseProps}>
+	<main>
+		<section>
+			<article>
+				{
+					myPageMemo && (
+						<>
+							<BadgeLink
+								text="Link to memos original page"
+								href={`${MemosSourceUrl}/${myPageMemo.id}`}
+							/>
+						</>
+					)
+				}
+				{!myPageMemo && <Content404 pageName={contentName} {error} />}
+				{myPageMemo && <ContentRenderer doc={myPageMemo} />}
+			</article>
+		</section>
+	</main>
+</BaseLayout>

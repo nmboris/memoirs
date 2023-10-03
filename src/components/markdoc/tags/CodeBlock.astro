@@ -1,0 +1,19 @@
+---
+import { Prism } from "@astrojs/prism";
+
+export const codeblock = {
+	render: "CodeBlock",
+	attributes: {
+		lang: {
+			type: String,
+			default: "js",
+		},
+	},
+};
+
+const renderedCode = await Astro.slots.render("default");
+const code = decodeURIComponent(renderedCode).trim();
+const lang = Astro.props.lang || "js";
+---
+
+<Prism code={code} lang={lang} />

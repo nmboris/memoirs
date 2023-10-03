@@ -1,0 +1,76 @@
+---
+import type { APIMemoQueryResponse, MemoWithMeta, MemosHost } from "@lib/types";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { parseMarkdoc } from "@lib/markdocHelpers";
+import { getMemoServerCfg } from "@lib/apiHelper";
+import Content404 from "@components/Content404.astro";
+import Card from "@components/Card.astro";
+
+import { GET } from "@api/memos.ts";
+
+const baseProps = { title: "Homepage", description: "Welcome to my homepage" };
+const memoHostData = Astro.cookies
+	.get("memoirs.memos.host")!
+	.json() as MemosHost; // Set in middleware
+
+const { MemosAssetUrl } = getMemoServerCfg(Astro.url.origin, memoHostData);
+
+let error: Error | null = null;
+let markdocMemos: MemoWithMeta[] = [];
+let memosJson: APIMemoQueryResponse | null = null;
+
+try {
+	// TODO: The following GET error is an Astro specific probleme,
+	// see https://github.com/withastro/astro/issues/8514
+	// @ts-ignore
+	const memosResp = (await GET(Astro)) as Response;
+	memosJson = (await memosResp.json()) as APIMemoQueryResponse;
+
+	markdocMemos = memosJson.data
+		.map((memo) => parseMarkdoc(MemosAssetUrl, memo))
+		.filter((memo) => {
+			// TODO: There must be a better solution than just filter out page content from the results
+			return !memo.frontmatter.hasOwnProperty("memoirs_page");
+		});
+} catch (e) {
+	console.error(e);
+	error = e as Error;
+}
+---
+
+<BaseLayout {...baseProps}>
+	{error && <Content404 pageName={""} {error} />}
+	<main>
+		<section>
+			<div class="grid">
+				{markdocMemos.map((memo, i: number) => <Card {memo} />)}
+			</div>
+		</section>
+
+		<nav class="contentNav">
+			<div>
+				{memosJson?.lastPage ? <a href={memosJson?.lastPage}>« back</a> : ""}
+			</div>
+			<div>
+				{memosJson?.nextPage ? <a href={memosJson?.nextPage}>next »</a> : ""}
+			</div>
+		</nav>
+	</main>
+</BaseLayout>
+
+<style>
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(var(--card-width), 1fr));
+		grid-gap: var(--card-grid-gap);
+
+		justify-items: center;
+	}
+
+	nav.contentNav {
+		display: grid;
+		grid-auto-flow: column;
+		place-content: center;
+		gap: var(--space-8);
+	}
+</style>

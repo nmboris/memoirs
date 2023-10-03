@@ -1,0 +1,67 @@
+---
+import type { MemoWithMeta } from "@lib/types";
+
+type Props = {
+	memo: MemoWithMeta;
+};
+
+const { memo } = Astro.props;
+
+const imgSrc = memo.imageUrl.length
+	? memo.imageUrl
+	: `/blog-placeholder-${Math.floor(Math.random() * 4) + 1}.jpg`;
+---
+
+<div class="card">
+	<div class="image">
+		<a href={`/memo/${memo.id}`} role="button">
+			<img src={imgSrc} alt={memo.title} />
+		</a>
+	</div>
+	<h2>{memo.title}</h2>
+	<p class="teaser line-clamp">{memo.abstract}</p>
+</div>
+
+<style>
+	.card {
+		max-width: var(--card-width);
+		border-radius: var(--radius);
+		margin-bottom: 2.6rem;
+	}
+
+	h2 {
+		margin-top: var(--space-4);
+		text-align: center;
+	}
+
+	.image {
+		--height: 10rem;
+
+		height: var(--height);
+		overflow: hidden;
+		border-radius: var(--radius);
+	}
+
+	.image img {
+		width: 100%;
+		height: var(--height);
+		object-fit: cover;
+		border-radius: var(--radius);
+
+		transition-duration: 0.3s;
+		transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+		transition-property: transform;
+	}
+
+	.image img:hover {
+		transform: scale(1.1);
+	}
+
+	@media (max-width: 720px) {
+		.card {
+			max-width: 100%;
+			padding-inline: 1rem;
+			margin-bottom: 1.6rem;
+		}
+	}
+</style>

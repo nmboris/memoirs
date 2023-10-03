@@ -1,0 +1,20 @@
+{
+	"name": "memoirs",
+	"type": "module",
+	"version": "0.0.1",
+	"license": "MIT",
+	"scripts": {
+		"dev": "astro dev",
+		"start": "astro dev",
+		"build": "astro build",
+		"preview": "astro preview",
+		"astro": "astro"
+	},
+	"dependencies": {
+		"@astrojs/prism": "^3.0.0",
+		"@markdoc/markdoc": "^0.3.2",
+		"astro": "^3.2.0",
+		"gray-matter": "^4.0.3",
+		"markdown-it": "^13.0.2"
+	}
+}

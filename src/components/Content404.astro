@@ -1,0 +1,70 @@
+---
+import { Prism } from "@astrojs/prism";
+import Badge from "./Badge.astro";
+
+type Props = {
+	pageName: string;
+	error: Error | null;
+};
+
+const { pageName, error } = Astro.props;
+---
+
+{
+	error && (
+		<p>
+			<h1>An error has occurred while loading data</h1>
+			<Badge multiline error>
+				<p class="message">{error.message}</p>
+				<p>
+					If the error occurred due to misconfiguration, please{" "}
+					<a href="/admin">change the configuration</a>.
+				</p>
+			</Badge>
+		</p>
+	)
+}
+
+{
+	!error && (
+		<>
+			<h1>🧑‍🚀 Hello, Memoirs!</h1>
+
+			<Badge style="margin-bottom: var(--space-8);" multiline error>
+				<p>
+					Unfortunately we couldn't find any content for this page. Please
+					create a note in your memo instance with at least the following
+					Frontmatter information:
+				</p>
+			</Badge>
+			<Prism
+				code={`---
+memoirs_page: ${pageName}
+title: ...Enter your page title here...
+---
+# 🧑‍🚀 Hello, Headline
+
+This is the content of your page. You can use Markdown here.`}
+				lang="md"
+			/>
+		</>
+	)
+}
+
+<style>
+	p {
+		font-size: var(--default-font-size);
+	}
+
+	.error {
+		margin-top: 2rem;
+		padding: 1rem;
+
+		.message {
+			margin-block: 2rem;
+			padding: 1rem;
+			background: #fdd;
+			border: 1px solid #f00;
+		}
+	}
+</style>

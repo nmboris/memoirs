@@ -1,0 +1,46 @@
+---
+export const griditem = {
+	render: "GridItem",
+	attributes: {
+		column: {
+			type: String,
+			default: "auto/auto",
+		},
+		element: {
+			type: String,
+			default: "div",
+		},
+	},
+};
+
+type Props = {
+	column: string;
+	element: string;
+};
+
+const { column, element } = Astro.props;
+
+// Thanks copilot for this type assertion :)
+const Element = element as keyof HTMLElementTagNameMap;
+
+// BUG: With dynamic tags, define:vars doesn't work
+---
+
+<Element class="grid-item" style={`grid-column: ${column}`}>
+	<slot />
+</Element>
+
+<style define:vars={{ column }}>
+	.grid-item {
+		display: flex;
+		flex-direction: column;
+		grid-column: var(--column);
+		gap: 1rem;
+	}
+
+	@media (max-width: 720px) {
+		aside.grid-item {
+			display: none;
+		}
+	}
+</style>

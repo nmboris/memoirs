@@ -1,0 +1,27 @@
+---
+import "@styles/global.css";
+
+import BaseHead from "./BaseHead.astro";
+import Header from "@components/Header.astro";
+import type { BaseLayoutProps } from "@lib/types";
+import Footer from "@components/Footer.astro";
+
+type Props = BaseLayoutProps;
+
+const { title, description } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={title || "Memoirs"}
+			description={description || "A single memoir"}
+		/>
+	</head>
+	<body>
+		<Header />
+		<slot />
+		<Footer />
+	</body>
+</html>

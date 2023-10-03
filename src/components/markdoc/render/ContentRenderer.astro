@@ -1,0 +1,116 @@
+---
+// import type { MemoWithMeta } from "@lib/types";
+import Markdoc, { type Config } from "@markdoc/markdoc";
+import MarkdocRenderer from "./MarkdocRenderer.astro";
+
+// Markdoc Components Imports
+import Button, { button } from "../tags/Button.astro";
+import MemoTag, { memoTag } from "../tags/MemoTag.astro";
+import Group, { group } from "../tags/Group.astro";
+import CodeBlock, { codeblock } from "../tags/CodeBlock.astro";
+import Grid, { grid } from "../tags/Grid.astro";
+import GridItem, { griditem } from "../tags/GridItem.astro";
+import SearchBox, { searchbox } from "../tags/SearchBox.astro";
+import type { MemoWithMeta } from "@lib/types";
+
+type Props = {
+	doc: MemoWithMeta;
+};
+
+const { doc } = Astro.props;
+
+// We need to prepare the code blocks to use the native Astro function
+const content = doc.patchedContent.replace(
+	/```(.*)(?<c>[\s\S]*?)```/g,
+	(_match: string, lang: String, code: string) => {
+		// Encoding codeblock prevents the code block from being parsed by Astro
+		return `{% codeblock lang="${lang}" %}${encodeURIComponent(
+			code
+		)} {% /codeblock %}`;
+	}
+);
+
+// Here we add markdown backslashes to all single new lines to force a line break
+// FIXME: Here should be a fix to prevent the markdown parser from removing single new lines
+const contentBRed = content.trim();
+// .replaceAll("\n\n", "✂️")
+// .replace(/\n(?!\W)/g, "\\\n")
+// .replaceAll("✂️", "\n\n");
+
+// Remove the title from the content if it's the same as the doc title
+const splittedContent = contentBRed.split("\n");
+const firstLine = splittedContent[0].replace(/#/g, "").trim();
+if (firstLine === doc.title) {
+	splittedContent.shift();
+}
+
+const finalContent = splittedContent.join("\n");
+
+// Parse the final content
+const markdocAst = Markdoc.parse(finalContent);
+
+// A Markdoc demo function that can be used in the markdoc content
+const uppercase = {
+	transform(parameters: string[]) {
+		const param1 = parameters[0];
+
+		return typeof param1 === "string" ? param1.toUpperCase() : param1;
+	},
+};
+
+const markdocConfig: Config = {
+	nodes: {},
+	tags: {
+		codeblock,
+		button,
+		memoTag,
+		group,
+		grid,
+		griditem,
+		searchbox,
+	},
+	variables: {
+		frontmatter: doc.frontmatter || [],
+	},
+	functions: {
+		uppercase,
+	},
+	partials: {},
+	validation: {},
+};
+
+const transformedContent = Markdoc.transform(markdocAst, markdocConfig);
+
+const components = {
+	CodeBlock: {
+		Component: CodeBlock,
+		props: {},
+	},
+	Button: {
+		Component: Button,
+		props: {},
+	},
+	MemoTag: {
+		Component: MemoTag,
+		props: {},
+	},
+	Group: {
+		Component: Group,
+		props: { a: 1 },
+	},
+	Grid: {
+		Component: Grid,
+		props: {},
+	},
+	GridItem: {
+		Component: GridItem,
+		props: {},
+	},
+	SearchBox: {
+		Component: SearchBox,
+		props: {},
+	},
+};
+---
+
+<MarkdocRenderer content={transformedContent} components={components} />
