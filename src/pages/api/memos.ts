@@ -56,7 +56,7 @@ export const GET: APIRoute = async (context: APIContext) => {
 
 	// If refresh param was set, delete the cache for this memo result
 	if (refresh) {
-		console.log(`:: Deleting cache for ${url}`);
+		// console.log(`:: Deleting cache for ${url}`);
 		_globalCache.delete(url);
 	}
 
