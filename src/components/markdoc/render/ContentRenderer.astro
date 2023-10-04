@@ -16,6 +16,7 @@ import SearchBox, { searchbox } from "../tags/SearchBox.astro";
 import Tabs, { tabs } from "../tags/Tabs.astro";
 import Tab, { tab } from "../tags/Tab.astro";
 import InlineImage, { img } from "../tags/InlineImage.astro";
+import SideNav, { sidenav } from "../tags/SideNav.astro";
 
 type Props = {
 	doc: MemoWithMeta;
@@ -75,6 +76,7 @@ const markdocConfig: Config = {
 		tabs,
 		tab,
 		img,
+		sidenav,
 	},
 	variables: {
 		frontmatter: doc.frontmatter || [],
@@ -130,6 +132,10 @@ const components = {
 		props: {
 			attachments: JSON.stringify(doc.resourceList),
 		},
+	},
+	SideNav: {
+		Component: SideNav,
+		props: {},
 	},
 };
 ---

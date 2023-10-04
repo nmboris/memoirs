@@ -1,0 +1,193 @@
+---
+import type { MemosHost, MemoWithMeta, APIMemoQueryResponse } from "@lib/types";
+import { getMemoServerCfg } from "@lib/apiHelper";
+import { parseMarkdoc } from "@lib/markdocHelpers";
+
+import { GET } from "@api/memos.ts";
+import ContentRenderer from "../render/ContentRenderer.astro";
+
+/**
+ * THIS COMPONENT USES CLIENT SIDE JS TO RENDER THE SIDENAV
+ */
+
+export const sidenav = {
+	render: "SideNav",
+	attributes: {
+		tag: {
+			type: String,
+			default: "sidenav",
+		},
+		gap: {
+			type: String,
+			default: "0",
+		},
+	},
+};
+
+type Props = {
+	tag: string;
+	gap: string;
+	content: string;
+};
+
+const { tag, gap } = Astro.props;
+
+const memoHostData = Astro.cookies
+	.get("memoirs.memos.host")!
+	.json() as MemosHost; // Set in middleware
+
+const { MemosAssetUrl } = getMemoServerCfg(Astro.url.origin, memoHostData);
+
+let markdocsWithMeta: MemoWithMeta[] = [];
+let error: Error | null = null;
+
+try {
+	Astro.props.content = `memoirs_sidenav: ${tag}`;
+
+	// TODO: The following GET error is an Astro specific probleme,
+	// see https://github.com/withastro/astro/issues/8514
+	// @ts-ignore
+	const memosResp = (await GET(Astro)) as Response;
+	const memoResult = (await memosResp.json()) as APIMemoQueryResponse;
+	// TODO: num of query results has to differ from search results!!
+
+	markdocsWithMeta = memoResult.data.map((memo) =>
+		parseMarkdoc(MemosAssetUrl, memo)
+	);
+
+	markdocsWithMeta.sort((a, b) => {
+		const tagA = a.frontmatter.memoirs_sidenav as string;
+		const tagB = b.frontmatter.memoirs_sidenav as string;
+
+		const tagIndexA = tagA
+			? tagA.split(",")[1]
+				? parseInt(tagA.split(",")[1])
+				: -1
+			: -1;
+		const tagIndexB = tagB
+			? tagB.split(",")[1]
+				? parseInt(tagB.split(",")[1])
+				: -1
+			: -1;
+
+		return tagIndexA - tagIndexB;
+	});
+} catch (e) {
+	error = e as Error;
+	console.error(e);
+}
+---
+
+<div class="sidenav">
+	<nav>
+		<ul>
+			{
+				markdocsWithMeta.map((m) => (
+					<li>
+						<span>{m.title}</span>
+					</li>
+				))
+			}
+		</ul>
+	</nav>
+	<div class="content">
+		{
+			markdocsWithMeta.map((mdoc) => (
+				<div>
+					<ContentRenderer doc={mdoc} />
+				</div>
+			))
+		}
+	</div>
+</div>
+
+<style define:vars={{ gap }}>
+	nav {
+		grid-column: 1/4;
+		padding-block: var(--space-4);
+
+		background-color: var(--color-secondary);
+		border-radius: var(--radius);
+	}
+
+	.sidenav {
+		display: grid;
+		gap: var(--gap);
+		/* grid-template-columns: auto 1fr; */
+		grid-auto-flow: column;
+		grid-template-columns: repeat(12, 1fr);
+	}
+
+	.sidenav ul {
+		list-style: none;
+		padding: 0;
+		margin: var(--space-2) var(--space-2);
+	}
+
+	.sidenav ul li {
+		cursor: pointer;
+		border-radius: var(--radius);
+		padding-block: var(--space-2);
+
+		& span {
+			padding-inline: var(--space-1);
+		}
+	}
+
+	.sidenav ul li:hover {
+		color: var(--color-text-invers);
+		background-color: var(--color-primary);
+	}
+
+	.sidenav ul li.active {
+		color: var(--color-primary);
+
+		&:hover {
+			color: var(--color-text-invers);
+		}
+	}
+
+	.content {
+		grid-column: 4/13;
+	}
+
+	.content div {
+		display: none;
+	}
+
+	.content div.active {
+		display: block;
+	}
+
+	@media (max-width: 720px) {
+		.sidenav {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
+
+<script>
+	document.addEventListener(
+		"astro:page-load",
+		() => {
+			const menuItems: NodeListOf<HTMLLIElement> =
+				document.querySelectorAll(".sidenav ul li");
+			if (!menuItems.length) return;
+
+			const contentItems = document.querySelectorAll(".content div");
+
+			menuItems.forEach((item, idx) => {
+				item.addEventListener("click", () => {
+					menuItems.forEach((item) => item.classList.remove("active"));
+					item.classList.add("active");
+
+					contentItems.forEach((item) => item.classList.remove("active"));
+					contentItems[idx].classList.add("active");
+				});
+			});
+
+			menuItems[0].click();
+		},
+		{ once: false }
+	);
+</script>
