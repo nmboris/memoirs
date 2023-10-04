@@ -51,9 +51,11 @@ export interface ResolvedRelation extends Relation {
 	title: string;
 }
 
+export type RowStatus = "NORMAL" | "ARCHIVED";
+
 export interface Memo {
 	id: number;
-	rowStatus: string;
+	rowStatus: RowStatus;
 	creatorId: number;
 	createdTs: number;
 	updatedTs: number;
