@@ -12,7 +12,7 @@ const { props } = Astro;
 <style>
 	button {
 		color: var(--color-text-invers);
-		background: var(--color-accent);
+		background: var(--color-primary);
 		border: none;
 		border-radius: 0.25rem;
 		cursor: pointer;
@@ -23,10 +23,10 @@ const { props } = Astro;
 	}
 
 	button:hover {
-		background: var(--color-accent-dark);
+		background: var(--color-primary-dark);
 	}
 
 	button:active {
-		background: hsl(348, 83%, 38%);
+		background: var(--color-primary-light);
 	}
 </style>

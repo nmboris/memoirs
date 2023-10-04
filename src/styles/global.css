@@ -9,10 +9,20 @@
 }
 
 :root {
-	--color-accent-hsl: 341, 78%, 49%;
-	--color-accent-dark-hsl: 341, 78%, 42%;
+	--color-primary-hsl: 341, 78%, 49%; /* pink */
+	--color-primary: hsl(var(--color-primary-hsl));
+
+	--color-primary-light-hsl: 341, 78%, 60%; /* light pink */
+	--color-primary-light: hsl(var(--color-primary-light-hsl));
+
+	--color-primary-dark-hsl: 341, 78%, 42%; /* dark pink */
+	--color-primary-dark: hsl(var(--color-primary-dark-hsl));
+
+	--color-secondary-hsl: 0, 0%, 90%; /* hight gray */
+	--color-secondary: hsl(var(--color-secondary-hsl));
+
+	--color-accent-hsl: 330, 4%, 60%; /* dark gray */
 	--color-accent: hsl(var(--color-accent-hsl));
-	--color-accent-dark: hsl(var(--color-accent-dark-hsl));
 
 	--color-text-hsl: 0, 0%, 20%;
 	--color-text-2-hsl: 0, 0%, 40%;
