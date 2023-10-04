@@ -135,3 +135,19 @@ export const resolveRelations = async (
 			} as ResolvedRelation;
 		})
 	);
+
+/**
+ * Filters out memos of type page
+ * @param memoList The list of memos to filter
+ * @returns The filtered list of memos
+ */
+export const filterOutPages = (memoList: MemoWithMeta[]) => {
+	// TODO: This is really hacky, but is there a filter function for the query against memos?
+	const filtered = memoList.filter(
+		(memo) =>
+			["memoirs_page", "memoirs_sidenav"].filter((s) => s in memo.frontmatter)
+				.length === 0
+	);
+
+	return filtered;
+};

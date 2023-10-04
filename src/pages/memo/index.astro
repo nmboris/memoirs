@@ -1,7 +1,7 @@
 ---
 import type { APIMemoQueryResponse, MemoWithMeta, MemosHost } from "@lib/types";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { parseMarkdoc } from "@lib/markdocHelpers";
+import { filterOutPages, parseMarkdoc } from "@lib/markdocHelpers";
 import { getMemoServerCfg } from "@lib/apiHelper";
 import Content404 from "@components/Content404.astro";
 import Card from "@components/Card.astro";
@@ -9,6 +9,7 @@ import Card from "@components/Card.astro";
 import { GET } from "@api/memos.ts";
 
 const baseProps = { title: "Homepage", description: "Welcome to my homepage" };
+
 const memoHostData = Astro.cookies
 	.get("memoirs.memos.host")!
 	.json() as MemosHost; // Set in middleware
@@ -26,12 +27,11 @@ try {
 	const memosResp = (await GET(Astro)) as Response;
 	memosJson = (await memosResp.json()) as APIMemoQueryResponse;
 
-	markdocMemos = memosJson.data
-		.map((memo) => parseMarkdoc(MemosAssetUrl, memo))
-		.filter((memo) => {
-			// TODO: There must be a better solution than just filter out page content from the results
-			return !memo.frontmatter.hasOwnProperty("memoirs_page");
-		});
+	const allMarkdocMemos = memosJson.data.map((memo) =>
+		parseMarkdoc(MemosAssetUrl, memo)
+	);
+
+	markdocMemos = filterOutPages(allMarkdocMemos);
 } catch (e) {
 	console.error(e);
 	error = e as Error;

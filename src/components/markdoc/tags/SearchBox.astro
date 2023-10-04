@@ -6,7 +6,7 @@
 import Box from "@components/Box.astro";
 import Content404 from "@components/Content404.astro";
 import { getMemoServerCfg } from "@lib/apiHelper";
-import { parseMarkdoc } from "@lib/markdocHelpers";
+import { filterOutPages, parseMarkdoc } from "@lib/markdocHelpers";
 import type { APIMemoQueryResponse, MemoWithMeta, MemosHost } from "@lib/types";
 
 import { GET } from "@api/memos.ts";
@@ -39,6 +39,7 @@ type Props = {
 	query: string;
 	type: "tag" | "content";
 	count: number;
+	limit?: number;
 };
 
 const { title, query, count } = Astro.props;
@@ -54,6 +55,8 @@ let error: Error | null = null;
 
 try {
 	Astro.props.query = query;
+	Astro.props.limit = 30; // TODO: Workaround for the problem, finding Pages in result aka. no filtering
+
 	// TODO: The following GET error is an Astro specific probleme,
 	// see https://github.com/withastro/astro/issues/8514
 	// @ts-ignore
@@ -62,13 +65,11 @@ try {
 
 	// TODO: num of query results has to differ from search results!!
 
-	markDocWithMeta = memoResult.data
-		.map((memo) => parseMarkdoc(MemosAssetUrl, memo))
-		.filter((memo) => {
-			// TODO: There must be a better solution than just filter out page content from the results
-			return !memo.frontmatter.hasOwnProperty("memoirs_page");
-		})
-		.slice(0, count);
+	markDocWithMeta = memoResult.data.map((memo) =>
+		parseMarkdoc(MemosAssetUrl, memo)
+	);
+
+	markDocWithMeta = filterOutPages(markDocWithMeta).slice(0, count);
 } catch (e) {
 	error = e as Error;
 	console.error(e);

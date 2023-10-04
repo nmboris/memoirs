@@ -29,8 +29,10 @@ export const GET: APIRoute = async (context: APIContext) => {
 	const offsetStr = searchParams.get("offset") ?? "0";
 	const offset = parseInt(offsetStr);
 
-	const limitStr = searchParams.get("limit") ?? QUERY_LIMIT;
+	const limitStr =
+		context.props.limit ?? searchParams.get("limit") ?? QUERY_LIMIT;
 	const limit = parseInt(limitStr);
+
 	const limitPlus = limit + 1;
 
 	const queryForTag = searchParams.has("tag")
@@ -49,8 +51,9 @@ export const GET: APIRoute = async (context: APIContext) => {
 			: null;
 
 	const refresh = searchParams.has("refresh");
+	const rowStat = searchParams.get("rowStatus") ?? "NORMAL";
 
-	const url = `${MemosApiUrl}/memo?creatorUsername=${user}${
+	const url = `${MemosApiUrl}/memo?rowStatus=${rowStat}&creatorUsername=${user}${
 		query ? `&${query}` : ""
 	}&limit=${limitPlus}${offset > 0 ? `&offset=${offset}` : ""}`;
 
