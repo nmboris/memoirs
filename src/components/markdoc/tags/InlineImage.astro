@@ -1,0 +1,67 @@
+---
+import { Image } from "astro:assets";
+import { getMemoServerCfg } from "@lib/apiHelper";
+import type { MemosHost, ResourceItem } from "@lib/types";
+
+const memoHostData = Astro.cookies
+	.get("memoirs.memos.host")!
+	.json() as MemosHost; // Set in middleware
+
+const { MemosAssetUrl } = getMemoServerCfg(Astro.url.origin, memoHostData);
+
+export const img = {
+	render: "InlineImage",
+	attributes: {
+		index: {
+			type: Number,
+		},
+		width: {
+			type: Number,
+			default: 24,
+		},
+		height: {
+			type: Number,
+			default: 24,
+		},
+		alt: {
+			type: String,
+			default: "Decoration",
+		},
+		style: {
+			type: String,
+			default: "",
+		},
+	},
+};
+
+type Props = {
+	index: number;
+	width: number;
+	height: number;
+	alt: string;
+	attachments?: string;
+	style: string;
+};
+
+const { index, attachments, width, height, alt, style } = Astro.props;
+
+const allAttachments: ResourceItem[] = attachments
+	? JSON.parse(attachments)
+	: [];
+
+const attachment =
+	allAttachments && allAttachments.length >= index
+		? allAttachments[index - 1] // Normal people count from 1 ;-)
+		: null;
+
+const imgPath = attachment ? `${MemosAssetUrl}/${attachment.id}` : null;
+---
+
+{
+	imgPath && (
+		<Image {style} src={imgPath} alt={alt} width={width} height={height} />
+	)
+}
+{!imgPath && <> </>}
+
+<style></style>

@@ -15,6 +15,7 @@ import GridItem, { griditem } from "../tags/GridItem.astro";
 import SearchBox, { searchbox } from "../tags/SearchBox.astro";
 import Tabs, { tabs } from "../tags/Tabs.astro";
 import Tab, { tab } from "../tags/Tab.astro";
+import InlineImage, { img } from "../tags/InlineImage.astro";
 
 type Props = {
 	doc: MemoWithMeta;
@@ -73,6 +74,7 @@ const markdocConfig: Config = {
 		searchbox,
 		tabs,
 		tab,
+		img,
 	},
 	variables: {
 		frontmatter: doc.frontmatter || [],
@@ -122,6 +124,12 @@ const components = {
 	Tab: {
 		Component: Tab,
 		props: {},
+	},
+	InlineImage: {
+		Component: InlineImage,
+		props: {
+			attachments: JSON.stringify(doc.resourceList),
+		},
 	},
 };
 ---
