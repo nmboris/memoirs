@@ -9,8 +9,10 @@
 }
 
 :root {
-	--color-accent: 341, 78%, 49%;
-	--color-accent-dark: 341, 78%, 42%;
+	--color-accent-hsl: 341, 78%, 49%;
+	--color-accent-dark-hsl: 341, 78%, 42%;
+	--color-accent: hsl(var(--color-accent-hsl));
+	--color-accent-dark: hsl(var(--color-accent-dark-hsl));
 
 	--color-text-hsl: 0, 0%, 20%;
 	--color-text-2-hsl: 0, 0%, 40%;
@@ -68,6 +70,8 @@ section {
 }
 
 article {
+	padding-inline: var(--space-4);
+
 	& img {
 		max-width: 100%;
 	}
