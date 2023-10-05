@@ -83,7 +83,7 @@ try {
 		<ul>
 			{
 				markdocsWithMeta.map((m) => (
-					<li>
+					<li data-doc-id={m.id}>
 						<span>{m.title}</span>
 					</li>
 				))
@@ -93,7 +93,7 @@ try {
 	<div class="content">
 		{
 			markdocsWithMeta.map((mdoc) => (
-				<div>
+				<div data-doc-id={mdoc.id}>
 					<ContentRenderer doc={mdoc} />
 				</div>
 			))
@@ -169,15 +169,21 @@ try {
 				document.querySelectorAll(".sidenav ul li");
 			if (!menuItems.length) return;
 
-			const contentItems = document.querySelectorAll(".content div");
+			const contentItems: NodeListOf<HTMLDivElement> =
+				document.querySelectorAll(".content div");
 
 			menuItems.forEach((item, idx) => {
 				item.addEventListener("click", () => {
+					const myDocId = item.dataset.docId;
+					console.log(":: LI ID", item.dataset.docId);
+
 					menuItems.forEach((item) => item.classList.remove("active"));
 					item.classList.add("active");
 
 					contentItems.forEach((item) => item.classList.remove("active"));
-					contentItems[idx].classList.add("active");
+					[...contentItems]
+						.find((ci) => ci.dataset.docId === myDocId)
+						?.classList.add("active");
 				});
 			});
 
