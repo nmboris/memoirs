@@ -162,6 +162,7 @@ try {
 </style>
 
 <script>
+	// Special event listener for the astro view-transition feature
 	document.addEventListener(
 		"astro:page-load",
 		() => {
@@ -172,21 +173,28 @@ try {
 			const contentItems: NodeListOf<HTMLDivElement> =
 				document.querySelectorAll(".content div");
 
-			menuItems.forEach((item, idx) => {
+			menuItems.forEach((item) => {
+				// Add click event listener to all menu items
 				item.addEventListener("click", () => {
 					const myDocId = item.dataset.docId;
-					console.log(":: LI ID", item.dataset.docId);
 
+					// remove active class from all menu items
 					menuItems.forEach((item) => item.classList.remove("active"));
+
+					// add active class to clicked menu item
 					item.classList.add("active");
 
+					// remove active class from all content items
 					contentItems.forEach((item) => item.classList.remove("active"));
+
+					// add active class to content item with same data-doc-id as the clicked menu item
 					[...contentItems]
 						.find((ci) => ci.dataset.docId === myDocId)
 						?.classList.add("active");
 				});
 			});
 
+			// Click first menu item to show first content item
 			menuItems[0].click();
 		},
 		{ once: false }
