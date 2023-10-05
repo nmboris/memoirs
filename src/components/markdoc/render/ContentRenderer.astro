@@ -36,11 +36,9 @@ const content = doc.patchedContent.replace(
 );
 
 // Here we add markdown backslashes to all single new lines to force a line break
-// FIXME: Here should be a fix to prevent the markdown parser from removing single new lines
-const contentBRed = content.trim();
-// .replaceAll("\n\n", "✂️")
-// .replace(/\n(?!\W)/g, "\\\n")
-// .replaceAll("✂️", "\n\n");
+// This cannot be done in the Markdoc parser because it would break the code blocks
+const regex = /(?<!\n|^)(?<=[^#}])\n(?!^|\n)/g;
+const contentBRed = content.trim().replace(regex, "\\\n");
 
 // Remove the title from the content if it's the same as the doc title
 const splittedContent = contentBRed.split("\n");
