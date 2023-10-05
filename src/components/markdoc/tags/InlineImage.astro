@@ -16,12 +16,12 @@ export const img = {
 			type: Number,
 		},
 		width: {
-			type: Number,
-			default: 24,
+			type: String,
+			default: "24",
 		},
 		height: {
-			type: Number,
-			default: 24,
+			type: String,
+			default: "24",
 		},
 		alt: {
 			type: String,
@@ -54,14 +54,24 @@ const attachment =
 		? allAttachments[index - 1] // Normal people count from 1 ;-)
 		: null;
 
-const imgPath = attachment ? `${MemosAssetUrl}/${attachment.id}` : null;
+let imgPath: string | null = null;
+
+if (attachment) {
+	if (attachment.externalLink) {
+		imgPath = attachment.externalLink;
+	} else {
+		imgPath = `${MemosAssetUrl}/${attachment.id}`;
+	}
+}
+
+// Check if we can use Astro's Image component, because it requires width and height to be explcitely numbers
+const canUseAstroImage = !(isNaN(Number(width)) || isNaN(Number(height)));
 ---
 
 {
-	imgPath && (
+	imgPath && canUseAstroImage ? (
 		<Image {style} src={imgPath} alt={alt} width={width} height={height} />
+	) : (
+		<img {style} src={imgPath} alt={alt} width={width} height={height} />
 	)
 }
-{!imgPath && <> </>}
-
-<style></style>
