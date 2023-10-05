@@ -6,6 +6,9 @@ import MarkdocRenderer from "./MarkdocRenderer.astro";
 import type { MemoWithMeta } from "@lib/types";
 
 // Markdoc Components Imports
+
+import Link, { link } from "../nodes/Link.astro";
+
 import Button, { button } from "../tags/Button.astro";
 import MemoTag, { memoTag } from "../tags/MemoTag.astro";
 import Group, { group } from "../tags/Group.astro";
@@ -38,7 +41,7 @@ const content = doc.patchedContent.replace(
 
 // Here we add markdown backslashes to all single new lines to force a line break
 // This cannot be done in the Markdoc parser because it would break the code blocks
-const regex = /(?<!\n|^)(?<=[^#}])\n(?!^|\*\s|\-\s|[0-9]+\.|\n)/g;
+const regex = /(?<!\n|^)(?<=[^#}])\n(?!^|\*\s|\-\s|[0-9]+\.|{|\n)/g;
 const _contentBRed = content.trim().replace(regex, "\\\n");
 
 // Remove the title from the content if it's the same as the doc title
@@ -63,7 +66,9 @@ const uppercase = {
 };
 
 const markdocConfig: Config = {
-	nodes: {},
+	nodes: {
+		link,
+	},
 	tags: {
 		codeblock,
 		button,
@@ -139,6 +144,10 @@ const components = {
 	},
 	Checkbox: {
 		Component: Checkbox,
+		props: {},
+	},
+	Link: {
+		Component: Link,
 		props: {},
 	},
 };

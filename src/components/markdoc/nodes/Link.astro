@@ -1,0 +1,71 @@
+---
+export const link = {
+	render: "Link",
+	attributes: {
+		href: {
+			type: String,
+		},
+	},
+};
+
+type Props = {
+	href: string;
+};
+
+const { href } = Astro.props;
+
+const isExternal = ["http://", "https://"].some((prefix) =>
+	href.startsWith(prefix)
+);
+const target = isExternal ? "_blank" : undefined;
+const rel = isExternal ? "noopener nofollow" : undefined;
+---
+
+<div class="link">
+	<a class="aw-link" {href} {target} {rel}><slot /></a>
+	{
+		isExternal && (
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				width="24"
+				height="24"
+				viewBox="0 0 24 24"
+			>
+				<>
+					<path
+						fill="currentColor"
+						d="m13 3l3.293 3.293l-7 7l1.414 1.414l7-7L21 11V3z"
+					/>
+					<path
+						fill="currentColor"
+						d="M19 19H5V5h7l-2-2H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2v-5l-2-2v7z"
+					/>
+				</>
+			</svg>
+		)
+	}
+</div>
+
+<style>
+	.link {
+		display: inline-flex;
+		align-items: center;
+
+		& svg {
+			width: 16px;
+			margin-left: var(--space-1);
+		}
+	}
+
+	.aw-link {
+		display: inline-flex;
+		align-items: center;
+		text-decoration: none;
+
+		color: var(--color-primary);
+
+		&:hover {
+			color: var(--color-primary-dark);
+		}
+	}
+</style>
