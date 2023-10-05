@@ -14,9 +14,17 @@ const tagRegexp = new RegExp(/(#([^\s#,]+))/, "g");
  * @returns Patched content
  */
 const _patchContentTags = (content: string) => {
-	const replaced = content.replace(
+	// The tag tag
+	let replaced = content.replace(
 		tagRegexp,
 		'{% memoTag tag="$1" %}$1{% /memoTag %}'
+	);
+
+	// The checkbox tag
+	const pattern = /(.*)\[(X|\s|\_|\-|)\]\s(.*)/gim;
+	replaced = replaced.replace(
+		pattern,
+		'{% checkbox label="$3" status="$2" /%}'
 	);
 
 	return replaced;

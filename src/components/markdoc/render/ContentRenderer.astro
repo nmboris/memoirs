@@ -17,6 +17,7 @@ import Tabs, { tabs } from "../tags/Tabs.astro";
 import Tab, { tab } from "../tags/Tab.astro";
 import InlineImage, { img } from "../tags/InlineImage.astro";
 import SideNav, { sidenav } from "../tags/SideNav.astro";
+import Checkbox, { checkbox } from "../tags/Checkbox.astro";
 
 type Props = {
 	doc: MemoWithMeta;
@@ -38,16 +39,24 @@ const content = doc.patchedContent.replace(
 // Here we add markdown backslashes to all single new lines to force a line break
 // This cannot be done in the Markdoc parser because it would break the code blocks
 const regex = /(?<!\n|^)(?<=[^#}])\n(?!^|\n)/g;
-const contentBRed = content.trim().replace(regex, "\\\n");
+const _contentBRed = content.trim().replace(regex, "\\\n");
 
 // Remove the title from the content if it's the same as the doc title
-const splittedContent = contentBRed.split("\n");
+const splittedContent = _contentBRed.split("\n");
 const firstLine = splittedContent[0].replace(/#/g, "").trim();
 if (firstLine === doc.title) {
 	splittedContent.shift();
 }
 
 const finalContent = splittedContent.join("\n");
+
+console.log(
+	finalContent
+		.split("\n")
+		.filter((l) => l.indexOf("checkbox") > -1)
+		.join("\n"),
+	finalContent
+);
 
 // Parse the final content
 const markdocAst = Markdoc.parse(finalContent);
@@ -75,6 +84,7 @@ const markdocConfig: Config = {
 		tab,
 		img,
 		sidenav,
+		checkbox,
 	},
 	variables: {
 		frontmatter: doc.frontmatter || [],
@@ -133,6 +143,10 @@ const components = {
 	},
 	SideNav: {
 		Component: SideNav,
+		props: {},
+	},
+	Checkbox: {
+		Component: Checkbox,
 		props: {},
 	},
 };
