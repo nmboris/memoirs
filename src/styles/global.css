@@ -48,11 +48,15 @@
 
 	--radius: 6px;
 
-	--content-width: 1024px;
+	--content-width: 1440px;
 	--hero-image-height: 320px;
 
 	--card-width: 18rem;
 	--card-grid-gap: 1rem;
+}
+
+html {
+	scrollbar-gutter: stable;
 }
 
 body {
@@ -60,6 +64,12 @@ body {
 	line-height: 1.4;
 	color: var(--color-text);
 	font-size: var(--font-size-paragraph);
+}
+
+.content {
+	& li {
+		margin-left: var(--space-4);
+	}
 }
 
 .line-clamp {
@@ -71,6 +81,7 @@ body {
 
 main {
 	max-width: var(--content-width);
+	width: 100%;
 	margin-inline: auto;
 }
 

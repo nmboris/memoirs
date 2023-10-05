@@ -85,7 +85,19 @@ try {
 				<li>
 					<h2>
 						<a href={`/memo/${md.id}`}>{md.title || "Memo"}</a>
-						<span>⮞</span>
+						<span>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="24"
+								height="24"
+								viewBox="0 0 24 24"
+							>
+								<path
+									fill="currentColor"
+									d="M17.92 11.62a1 1 0 0 0-.21-.33l-5-5a1 1 0 0 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l5-5a1 1 0 0 0 .21-.33a1 1 0 0 0 0-.76Z"
+								/>
+							</svg>
+						</span>
 					</h2>
 					<p class="abstract">{md.abstract}</p>
 				</li>
@@ -99,7 +111,6 @@ try {
 		text-align: start;
 		padding-top: 0;
 
-		text-align: center;
 		margin-bottom: var(--space-2);
 		text-transform: uppercase;
 	}

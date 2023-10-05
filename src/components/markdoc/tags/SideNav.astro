@@ -104,10 +104,6 @@ try {
 <style define:vars={{ gap }}>
 	nav {
 		grid-column: 1/4;
-		padding-block: var(--space-4);
-
-		background-color: var(--color-secondary);
-		border-radius: var(--radius);
 	}
 
 	.sidenav {
@@ -120,18 +116,16 @@ try {
 
 	.sidenav ul {
 		list-style: none;
-		padding: 0;
-		margin: var(--space-2) var(--space-2);
+		padding: var(--space-4) 0;
+
+		background-color: var(--color-secondary);
+		border-radius: var(--radius);
 	}
 
 	.sidenav ul li {
 		cursor: pointer;
 		border-radius: var(--radius);
-		padding-block: var(--space-2);
-
-		& span {
-			padding-inline: var(--space-1);
-		}
+		padding: var(--space-1) var(--space-2);
 	}
 
 	.sidenav ul li:hover {
@@ -160,8 +154,9 @@ try {
 	}
 
 	@media (max-width: 720px) {
-		.sidenav {
-			grid-template-columns: 1fr;
+		nav,
+		.content {
+			grid-column: 1/13;
 		}
 	}
 </style>
