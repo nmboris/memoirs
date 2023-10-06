@@ -28,15 +28,12 @@ const SITE_TITLE = "MEMOIRS";
 	}
 
 	.siteTitle {
-		/* font-size: 1em; */
 		font-weight: bold;
 	}
 
 	.btn-admin {
 		display: flex;
 		align-items: center;
-		/* height: 2.4rem; */
-		/* margin-left: 1rem; */
 		padding: 0.2rem 0.4rem;
 		font-size: calc(0.8 * var(--font-size-paragraph));
 
@@ -54,13 +51,16 @@ const SITE_TITLE = "MEMOIRS";
 	}
 
 	header {
-		margin: 0;
-		padding: 0 1em;
-		background: white;
-		box-shadow: 0 2px 8px rgba(var(--black), 5%);
-
 		position: sticky;
 		top: 0;
+		z-index: 2;
+
+		margin: 0;
+		padding: 0 1em;
+		padding-bottom: var(--space-2);
+
+		background: white;
+		box-shadow: 0 2px 8px rgba(var(--black), 5%);
 	}
 
 	h2 {
@@ -72,33 +72,36 @@ const SITE_TITLE = "MEMOIRS";
 	h2 a.active {
 		text-decoration: none;
 	}
+
 	nav {
-		/* display: flex;
-		align-items: center;
-		justify-content: space-between; */
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
 		align-items: center;
 	}
+
 	nav a {
 		padding: 1em 0.5em;
 		color: var(--black);
 		border-bottom: 4px solid transparent;
 		text-decoration: none;
 	}
+
 	nav a.active {
 		text-decoration: none;
 		border-bottom-color: var(--accent);
 	}
+
 	.social-links,
 	.social-links a {
 		display: flex;
 		align-items: center;
 	}
+
 	@media (max-width: 720px) {
 		.btn-admin {
 			margin-left: 0;
 		}
+
 		header {
 			padding-inline: 0;
 		}
