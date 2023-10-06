@@ -10,7 +10,7 @@ type Props = {
 const { text, href, ...restProps } = Astro.props;
 ---
 
-<div {...restProps}>
+<div class="badgeLink" {...restProps}>
 	<a href={href} type="button" target="_blank">
 		<Badge>{text}</Badge>
 	</a>
