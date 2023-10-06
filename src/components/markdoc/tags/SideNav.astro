@@ -162,6 +162,11 @@ try {
 </style>
 
 <script>
+	const myUrl = new URL(document.URL);
+	const myHash = myUrl.hash.slice(1);
+
+	let hashFound = false;
+
 	// Special event listener for the astro view-transition feature
 	document.addEventListener(
 		"astro:page-load",
@@ -174,9 +179,16 @@ try {
 				document.querySelectorAll(".content div");
 
 			menuItems.forEach((item) => {
+				if (!item.dataset.docId) return;
+
 				// Add click event listener to all menu items
 				item.addEventListener("click", () => {
 					const myDocId = item.dataset.docId;
+
+					if (myDocId) {
+						myUrl.hash = myDocId;
+						history.replaceState({}, "", myUrl.toString());
+					}
 
 					// remove active class from all menu items
 					menuItems.forEach((item) => item.classList.remove("active"));
@@ -192,10 +204,17 @@ try {
 						.find((ci) => ci.dataset.docId === myDocId)
 						?.classList.add("active");
 				});
+
+				// Click menu item with same data-doc-id as the hash
+				// if yes, set hashFound to true and click the menu item
+				if (item.dataset.docId === myHash) {
+					hashFound = true;
+					item.click();
+				}
 			});
 
 			// Click first menu item to show first content item
-			menuItems[0].click();
+			!hashFound && menuItems[0].click();
 		},
 		{ once: false }
 	);
