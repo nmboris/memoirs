@@ -172,3 +172,9 @@ blockquote:before {
 blockquote p {
 	display: inline;
 }
+
+@media screen and (max-width: 720px) {
+	article {
+		padding-inline: var(--space-2);
+	}
+}
