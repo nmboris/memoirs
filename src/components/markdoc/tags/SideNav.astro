@@ -2,9 +2,10 @@
 import type { MemosHost, MemoWithMeta, APIMemoQueryResponse } from "@lib/types";
 import { getMemoServerCfg } from "@lib/apiHelper";
 import { parseMarkdoc } from "@lib/markdocHelpers";
-
 import { GET } from "@api/memos.ts";
+
 import ContentRenderer from "../render/ContentRenderer.astro";
+import BadgeLink from "@components/BadgeLink.astro";
 
 /**
  * THIS COMPONENT USES CLIENT SIDE JS TO RENDER THE SIDENAV
@@ -36,7 +37,10 @@ const memoHostData = Astro.cookies
 	.get("memoirs.memos.host")!
 	.json() as MemosHost; // Set in middleware
 
-const { MemosAssetUrl } = getMemoServerCfg(Astro.url.origin, memoHostData);
+const { MemosAssetUrl, MemosSourceUrl } = getMemoServerCfg(
+	Astro.url.origin,
+	memoHostData
+);
 
 let markdocsWithMeta: MemoWithMeta[] = [];
 let error: Error | null = null;
@@ -94,6 +98,12 @@ try {
 		{
 			markdocsWithMeta.map((mdoc) => (
 				<div data-doc-id={mdoc.id}>
+					<BadgeLink
+						style="display: block; padding-left: var(--space-4); padding-bottom: var(--space-4);"
+						text="Link to memos original page"
+						href={`${MemosSourceUrl}/${mdoc.id}`}
+					/>
+
 					<ContentRenderer doc={mdoc} />
 				</div>
 			))
