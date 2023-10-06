@@ -24,6 +24,9 @@
 	--color-accent-hsl: 330, 4%, 60%; /* dark gray */
 	--color-accent: hsl(var(--color-accent-hsl));
 
+	--color-background-hsl: 0, 0%, 100%; /* white */
+	--color-background: hsl(var(--color-background-hsl));
+
 	--color-text-hsl: 0, 0%, 20%;
 	--color-text-2-hsl: 0, 0%, 40%;
 	--color-text: hsl(var(--color-text-hsl));
