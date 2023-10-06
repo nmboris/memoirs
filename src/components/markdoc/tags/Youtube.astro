@@ -1,0 +1,37 @@
+---
+export const youtube = {
+	render: "Youtube",
+	attributes: {
+		id: {
+			type: String,
+			default: "acgIGT0J99U",
+		},
+		style: {
+			type: String,
+			default: "",
+		},
+		height: {
+			type: String,
+			default: "315",
+		},
+		width: {
+			type: String,
+			default: "560",
+		},
+	},
+};
+
+const { style, id, width, height } = Astro.props;
+---
+
+<div class="yt" {style}>
+	<iframe
+		width={width}
+		height={height}
+		src=`https://www.youtube-nocookie.com/embed/${id}`
+		title="YouTube video player"
+		allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+		allowfullscreen></iframe>
+</div>
+
+<style></style>

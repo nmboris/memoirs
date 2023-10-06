@@ -21,6 +21,7 @@ import Tab, { tab } from "../tags/Tab.astro";
 import InlineImage, { img } from "../tags/InlineImage.astro";
 import SideNav, { sidenav } from "../tags/SideNav.astro";
 import Checkbox, { checkbox } from "../tags/Checkbox.astro";
+import Youtube, { youtube } from "../tags/Youtube.astro";
 
 type Props = {
 	doc: MemoWithMeta;
@@ -82,6 +83,7 @@ const markdocConfig: Config = {
 		img,
 		sidenav,
 		checkbox,
+		youtube,
 	},
 	variables: {
 		frontmatter: doc.frontmatter || [],
@@ -148,6 +150,10 @@ const components = {
 	},
 	Link: {
 		Component: Link,
+		props: {},
+	},
+	Youtube: {
+		Component: Youtube,
 		props: {},
 	},
 };
