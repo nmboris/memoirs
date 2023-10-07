@@ -21,7 +21,7 @@ const target = isExternal ? "_blank" : undefined;
 const rel = isExternal ? "noopener nofollow" : undefined;
 ---
 
-<div class="link">
+<span class="link">
 	<a class="aw-link" {href} {target} {rel}><slot /></a>
 	{
 		isExternal && (
@@ -44,7 +44,7 @@ const rel = isExternal ? "noopener nofollow" : undefined;
 			</svg>
 		)
 	}
-</div>
+</span>
 
 <style>
 	.link {
