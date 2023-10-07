@@ -58,15 +58,6 @@ export const parseMarkdoc = (memoAssetUrl: string, memoRaw: Memo) => {
 		excerpt_separator: "---",
 	});
 
-	// Remove excerpt from content
-	if (rawMatter.excerpt) {
-		rawMatter.content = rawMatter.content.replace(
-			rawMatter.excerpt + "---",
-			""
-		);
-	}
-	// Now we have the content and (frontmatter-) data from the original post
-
 	// Add the tags to the frontmatter
 	const tagFrontmatterText = _generateTagFrontmatter(memoRaw.content);
 	const fakeFM = `---\n${tagFrontmatterText}\n---\n`;
