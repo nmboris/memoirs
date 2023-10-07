@@ -1,0 +1,55 @@
+---
+import { getMemoServerCfg } from "@lib/apiHelper";
+import type { APIMemoQueryResponse, MemosHost, MemoWithMeta } from "@lib/types";
+
+import { GET } from "@api/memos.ts";
+import { parseMarkdoc } from "@lib/markdocHelpers";
+import Link from "../nodes/Link.astro";
+
+export const contentLink = {
+	render: "ContentLink",
+	attributes: {
+		label: {
+			type: String,
+		},
+	},
+};
+
+// const renderedCode = await Astro.slots.render("default");
+// const code = decodeURIComponent(renderedCode).trim();
+const { label } = Astro.props;
+
+const memoHostData = Astro.cookies
+	.get("memoirs.memos.host")!
+	.json() as MemosHost; // Set in middleware
+
+const { MemosAssetUrl } = getMemoServerCfg(Astro.url.origin, memoHostData);
+
+let markdocWithMeta: MemoWithMeta | null = null;
+let error: Error | null = null;
+
+const content = `memoirs_slug: ${label}`;
+try {
+	Astro.props.content = content;
+
+	// TODO: The following GET error is an Astro specific probleme,
+	// see https://github.com/withastro/astro/issues/8514
+	// @ts-ignore
+	const memosResp = (await GET(Astro)) as Response;
+	const memoResult = (await memosResp.json()) as APIMemoQueryResponse;
+	const firstMatch = memoResult.data[0];
+
+	markdocWithMeta = parseMarkdoc(MemosAssetUrl, firstMatch);
+} catch (e) {
+	error = e as Error;
+	console.error(e);
+}
+---
+
+{
+	markdocWithMeta && (
+		<span class="contentLink">
+			<Link href={`/memo/${markdocWithMeta.id}`}>{markdocWithMeta.title}</Link>
+		</span>
+	)
+}

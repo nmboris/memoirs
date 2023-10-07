@@ -1,0 +1,87 @@
+---
+import { getMemoServerCfg } from "@lib/apiHelper";
+import { parseMarkdoc } from "@lib/markdocHelpers";
+import type { APIMemoQueryResponse, MemoWithMeta, MemosHost } from "@lib/types";
+import Link from "./markdoc/nodes/Link.astro";
+
+import { GET } from "@api/memos.ts";
+
+type Props = {
+	doc: MemoWithMeta;
+	showDivider?: boolean;
+	content?: string;
+};
+
+const { doc, showDivider=false } = Astro.props;
+const slug = doc.frontmatter.memoirs_slug;
+
+const memoHostData = Astro.cookies
+	.get("memoirs.memos.host")!
+	.json() as MemosHost; // Set in middleware
+
+const { MemosAssetUrl } = getMemoServerCfg(Astro.url.origin, memoHostData);
+
+let markdocsWithMeta: MemoWithMeta[] = [];
+let error: Error | null = null;
+
+const content = `[[${slug}]]`;
+try {
+	Astro.props.content = content;
+
+	// TODO: The following GET error is an Astro specific probleme,
+	// see https://github.com/withastro/astro/issues/8514
+	// @ts-ignore
+	const memosResp = (await GET(Astro)) as Response;
+	const memoResult = (await memosResp.json()) as APIMemoQueryResponse;
+	
+	markdocsWithMeta = memoResult.data.map((memo) =>
+		parseMarkdoc(MemosAssetUrl, memo)
+	);
+} catch (e) {
+	error = e as Error;
+	console.error(e);
+}
+---
+
+{
+	markdocsWithMeta.length ? (
+		<div class="backlinks">
+			{showDivider ? (
+				<hr />
+			) : (
+				<></>
+			)}
+			<h6 style="padding-top: var(--space-4);">Backlinks</h6>
+			<ul>
+				{markdocsWithMeta.map((mdoc) => (
+					<li>
+						<Link href={`/memo/${mdoc.id}`}>{mdoc.title}</Link>
+					</li>
+				))}
+			</ul>
+		</div>
+	) : (<></>)
+}
+
+<style>
+	ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+
+		font-size: calc(0.8 * var(--font-size-paragraph));
+	}
+
+	li {
+		margin-left: var(--space-4);
+	}
+
+	hr {
+		width: 12rem;
+		background-color: var(--color-secondary);
+		height: 3px;
+		border: none;
+
+		margin: var(--space-16) 0 var(--space-1) 0;
+	}
+</style>
