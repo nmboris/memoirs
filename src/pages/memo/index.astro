@@ -8,7 +8,10 @@ import Card from "@components/Card.astro";
 
 import { GET } from "@api/memos.ts";
 
-const baseProps = { title: "Homepage", description: "Welcome to my homepage" };
+const baseProps = {
+	title: "memoirs",
+	description: "A blogging service for usememos.com",
+};
 
 const memoHostData = Astro.cookies
 	.get("memoirs.memos.host")!

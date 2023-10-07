@@ -25,7 +25,7 @@ const memoHostData = Astro.cookies
 const { MemosSourceUrl, MemosAssetUrl, LocalSingleMemoApiUrl } =
 	getMemoServerCfg(Astro.url.origin, memoHostData);
 
-const baseProps = { title: "Memoirs", description: "A memoirs page" };
+const baseProps = { title: "memoirs", description: "A blogging service for usememos.com" };
 
 const localDateOptions: Intl.DateTimeFormatOptions = {
 	weekday: "long",

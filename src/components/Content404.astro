@@ -17,7 +17,7 @@ const { pageName, error } = Astro.props;
 			<Badge multiline error>
 				<p class="message">{error.message}</p>
 				<p>
-					If the error occurred due to misconfiguration, please{" "}
+					If the error occurred due to misconfiguration, please
 					<a href="/admin">change the configuration</a>.
 				</p>
 			</Badge>
@@ -31,6 +31,7 @@ const { pageName, error } = Astro.props;
 			<h1>🧑‍🚀 Hello, Memoirs!</h1>
 
 			<Badge style="margin-bottom: var(--space-8);" multiline error>
+				<div class="err404">404</div>
 				<p>Unfortunately we couldn't find any content for this page.</p>
 				<ul>
 					<li>Did you create a corresponding memo?</li>
@@ -57,6 +58,11 @@ This is the content of your page. You can use Markdown here.`}
 }
 
 <style>
+	.err404 {
+		font-size: 6em;
+		text-align: center;
+	}
+
 	p,
 	li {
 		font-size: 16px;
@@ -64,6 +70,7 @@ This is the content of your page. You can use Markdown here.`}
 
 	li {
 		margin-left: 1.6rem;
+		font-weight: bold;
 	}
 
 	.error {

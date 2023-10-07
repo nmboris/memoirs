@@ -1,7 +1,10 @@
 ---
 import StaticPage from "@layouts/StaticPage.astro";
 
-const baseProps = { title: "About me", description: "This is me" };
+const baseProps = {
+	title: "memoirs",
+	description: "A blogging service for usememos.com",
+};
 const contentName =
 	Astro.url.pathname === "/" ? "index" : Astro.url.pathname.slice(1);
 ---

@@ -12,6 +12,7 @@ import Content404 from "@components/Content404.astro";
 import { GET } from "@api/memos.ts";
 import BadgeLink from "@components/BadgeLink.astro";
 import ContentRenderer from "@components/markdoc/render/ContentRenderer.astro";
+import BaseHead from "./BaseHead.astro";
 
 type Props = {
 	baseProps: BaseLayoutProps;
@@ -46,6 +47,11 @@ try {
 	if (memosJson && memosJson.data.length) {
 		myPageMemo = parseMarkdoc(MemosAssetUrl, memosJson.data[0]);
 	}
+
+	baseProps.title = myPageMemo?.title || baseProps.title;
+	baseProps.description = myPageMemo?.abstract || baseProps.description;
+
+	console.log(":: TOTLE", baseProps, myPageMemo?.title);
 } catch (e) {
 	console.error(e);
 	error = e as Error;
