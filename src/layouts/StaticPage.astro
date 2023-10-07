@@ -50,8 +50,6 @@ try {
 
 	baseProps.title = myPageMemo?.title || baseProps.title;
 	baseProps.description = myPageMemo?.abstract || baseProps.description;
-
-	console.log(":: TOTLE", baseProps, myPageMemo?.title);
 } catch (e) {
 	console.error(e);
 	error = e as Error;
