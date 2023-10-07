@@ -91,6 +91,11 @@ main {
 section {
 	margin-inline: auto;
 	margin-block: var(--space-16);
+
+	& * {
+		max-width: 65ch;
+		margin-inline: auto;
+	}
 }
 
 article {

@@ -52,21 +52,17 @@ try {
 
 <BaseLayout {...baseProps}>
 	<main>
-		<section>
-			<article>
-				{
-					myPageMemo && (
-						<>
-							<BadgeLink
-								text="Link to memos original page"
-								href={`${MemosSourceUrl}/${myPageMemo.id}`}
-							/>
-						</>
-					)
-				}
-				{!myPageMemo && <Content404 pageName={contentName} {error} />}
-				{myPageMemo && <ContentRenderer doc={myPageMemo} />}
-			</article>
-		</section>
+		{
+			myPageMemo && (
+				<>
+					<BadgeLink
+						text="Link to memos original page"
+						href={`${MemosSourceUrl}/${myPageMemo.id}`}
+					/>
+				</>
+			)
+		}
+		{!myPageMemo && <Content404 pageName={contentName} {error} />}
+		{myPageMemo && <ContentRenderer doc={myPageMemo} />}
 	</main>
 </BaseLayout>

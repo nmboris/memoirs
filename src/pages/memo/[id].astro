@@ -165,10 +165,6 @@ try {
 		margin: var(--space-16) 0 var(--space-1) 0;
 	}
 
-	section {
-		max-width: 65ch;
-	}
-
 	.showDesktop {
 		@media (max-width: 720px) {
 			display: none;
@@ -184,11 +180,6 @@ try {
 	svg {
 		margin-left: var(--space-4);
 		height: calc(1.4 * var(--font-size-paragraph));
-	}
-
-	.content {
-		max-width: var(--content-width);
-		margin-inline: auto;
 	}
 
 	:global(p) {
@@ -241,11 +232,6 @@ try {
 	@media (max-width: 720px) {
 		main {
 			padding-inline: var(--space-4);
-		}
-
-		section {
-			padding-block: var(--space-1);
-			margin-block: 0;
 		}
 
 		.badgeLink {

@@ -41,20 +41,18 @@ try {
 <BaseLayout {...baseProps}>
 	{error && <Content404 pageName={""} {error} />}
 	<main>
-		<section>
-			<div class="grid">
-				{markdocMemos.map((memo, i: number) => <Card {memo} />)}
-			</div>
-		</section>
+		<div class="grid">
+			{markdocMemos.map((memo, i: number) => <Card {memo} />)}
+		</div>
 
-		<nav class="contentNav">
+		<!-- <nav class="contentNav">
 			<div>
 				{memosJson?.lastPage ? <a href={memosJson?.lastPage}>« back</a> : ""}
 			</div>
 			<div>
 				{memosJson?.nextPage ? <a href={memosJson?.nextPage}>next »</a> : ""}
 			</div>
-		</nav>
+		</nav> -->
 	</main>
 </BaseLayout>
 
