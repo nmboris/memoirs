@@ -100,22 +100,9 @@ section,
 	overflow: hidden;
 }
 
-/* article {
-	padding-inline: var(--space-4);
-
-	& img {
-		max-width: 100%;
-	}
-} */
-
-/* section,
-article {
-	margin-inline: auto;
-	margin-block: var(--space-16);
-
-	max-width: 65ch;
-	margin-inline: auto;
-} */
+article img {
+	max-width: 100%;
+}
 
 p {
 	margin-block: var(--space-4);
@@ -181,6 +168,7 @@ blockquote {
 	padding: 0.5em 10px;
 	quotes: "\201C""\201D""\2018""\2019";
 }
+
 blockquote:before {
 	color: #ccc;
 	content: open-quote;
@@ -189,6 +177,7 @@ blockquote:before {
 	margin-right: 0.25em;
 	vertical-align: -0.4em;
 }
+
 blockquote p {
 	display: inline;
 }
