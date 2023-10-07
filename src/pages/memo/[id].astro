@@ -24,7 +24,8 @@ const memoHostData = Astro.cookies
 
 const { MemosSourceUrl, MemosAssetUrl, LocalSingleMemoApiUrl } =
 	getMemoServerCfg(Astro.url.origin, memoHostData);
-const baseProps = { title: "Homepage", description: "Welcome to my homepage" };
+
+const baseProps = { title: "Memoirs", description: "A memoirs page" };
 
 const localDateOptions: Intl.DateTimeFormatOptions = {
 	weekday: "long",
@@ -58,6 +59,9 @@ try {
 		MemosAssetUrl,
 		markdocMemo.relationList
 	);
+
+	baseProps.title = markdocMemo.title;
+	baseProps.description = markdocMemo.frontmatter.description as string || markdocMemo.abstract || baseProps.description;
 } catch (e) {
 	console.error(e);
 	error = e as Error;
@@ -65,9 +69,9 @@ try {
 ---
 
 <BaseLayout {...baseProps}>
-	<main>
+	<main class="section">
 		<article>
-			<section>
+			
 				{error && <Content404 pageName={""} {error} />}
 				{
 					markdocMemo && (
@@ -150,7 +154,6 @@ try {
 					)
 				}
 				{markdocMemo && <Backlinks doc={markdocMemo} showDivider={relations?.length === 0 && markdocMemo.resourceList.length === 0} />}
-			</section>
 		</article>
 	</main>
 </BaseLayout>

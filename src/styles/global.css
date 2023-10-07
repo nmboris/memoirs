@@ -52,6 +52,8 @@
 	--radius: 6px;
 
 	--content-width: 1440px;
+	--section-width: 65ch;
+
 	--hero-image-height: 320px;
 
 	--card-width: 18rem;
@@ -69,7 +71,23 @@ body {
 	font-size: var(--font-size-paragraph);
 }
 
-.content {
+main {
+	max-width: var(--content-width);
+	width: 100%;
+	margin-inline: auto;
+}
+
+/* .content {
+	& li {
+		margin-left: var(--space-4);
+	}
+} */
+
+section,
+.section {
+	max-width: var(--section-width);
+	margin-inline: auto;
+
 	& li {
 		margin-left: var(--space-4);
 	}
@@ -82,29 +100,22 @@ body {
 	overflow: hidden;
 }
 
-main {
-	max-width: var(--content-width);
-	width: 100%;
-	margin-inline: auto;
-}
-
-section {
-	margin-inline: auto;
-	margin-block: var(--space-16);
-
-	& * {
-		max-width: 65ch;
-		margin-inline: auto;
-	}
-}
-
-article {
+/* article {
 	padding-inline: var(--space-4);
 
 	& img {
 		max-width: 100%;
 	}
-}
+} */
+
+/* section,
+article {
+	margin-inline: auto;
+	margin-block: var(--space-16);
+
+	max-width: 65ch;
+	margin-inline: auto;
+} */
 
 p {
 	margin-block: var(--space-4);
@@ -183,7 +194,8 @@ blockquote p {
 }
 
 @media screen and (max-width: 720px) {
-	article {
-		padding-inline: var(--space-2);
+	section,
+	.section {
+		padding-inline: var(--space-4);
 	}
 }

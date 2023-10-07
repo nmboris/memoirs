@@ -20,13 +20,13 @@ const { host, user } = getMemoServerCfg(Astro.url.origin, memoHostData);
 		<h1>Change Memos Source</h1>
 		<form method="post" action="/api/changeServer">
 			<input
-				type="text"
+				type="search"
 				name="host"
 				placeholder="e.g. 'https://demo.usememos.com' or empty for default"
 				value={host}
 			/>
 			<input
-				type="text"
+				type="search"
 				name="user"
 				placeholder="e.g. 'memos-demo' or empty for default"
 				value={user}
@@ -56,11 +56,31 @@ const { host, user } = getMemoServerCfg(Astro.url.origin, memoHostData);
 	}
 
 	input {
+		font-size: var(--font-size-paragraph);
 		padding: 0.4rem 1rem;
 		margin-bottom: 0.6rem;
+		border-radius: var(--radius);
+	}
+
+	input[type="submit"] {
+		margin-top: var(--space-8);
+		background-color: var(--color-primary);
+		color: var(--color-text-invers);
+		border: none;
+		border-radius: var(--radius);
+		cursor: pointer;
+		line-height: 2;
 	}
 
 	@media (max-width: 720px) {
+		main {
+			padding-inline: var(--space-4);
+		}
+
+		input {
+			font-size: calc(1.1 * var(--font-size-paragraph));
+		}
+
 		h1 {
 			font-size: 1.6rem;
 		}

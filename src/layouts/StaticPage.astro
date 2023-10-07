@@ -17,9 +17,11 @@ type Props = {
 	baseProps: BaseLayoutProps;
 	contentName: string;
 	content?: string;
+
+	[key: string]: unknown;
 };
 
-const { baseProps, contentName } = Astro.props;
+const { baseProps, contentName, ...restProps } = Astro.props;
 
 const memoHostData = Astro.cookies
 	.get("memoirs.memos.host")!
@@ -51,15 +53,14 @@ try {
 ---
 
 <BaseLayout {...baseProps}>
-	<main>
+	<main {...restProps}>
 		{
 			myPageMemo && (
-				<>
-					<BadgeLink
-						text="Link to memos original page"
-						href={`${MemosSourceUrl}/${myPageMemo.id}`}
-					/>
-				</>
+				<BadgeLink
+					style="margin-top: var(--space-4);"
+					text="Link to memos original page"
+					href={`${MemosSourceUrl}/${myPageMemo.id}`}
+				/>
 			)
 		}
 		{!myPageMemo && <Content404 pageName={contentName} {error} />}

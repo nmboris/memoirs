@@ -33,7 +33,7 @@ try {
 	// @ts-ignore
 	const memosResp = (await GET(Astro)) as Response;
 	const memoResult = (await memosResp.json()) as APIMemoQueryResponse;
-	
+
 	markdocsWithMeta = memoResult.data.map((memo) =>
 		parseMarkdoc(MemosAssetUrl, memo)
 	);
@@ -69,7 +69,7 @@ try {
 		padding: 0;
 		margin: 0;
 
-		font-size: calc(0.8 * var(--font-size-paragraph));
+		font-size: calc(0.9 * var(--font-size-paragraph));
 	}
 
 	li {
