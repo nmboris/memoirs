@@ -1,9 +1,40 @@
 ---
+import type { APIMemoirsMenuResponse } from "@lib/types";
 import HeaderLink from "./HeaderLink.astro";
-// import { SITE_TITLE } from "../consts";
 import Button from "@components/markdoc/tags/Button.astro";
 
+import { GET } from "@api/menu.ts";
+
+type Props = {
+	resetCache?: boolean;
+	refresh?: boolean;
+};
+
 const SITE_TITLE = "MEMOIRS";
+const { resetCache = true } = Astro.props;
+
+let menuData: APIMemoirsMenuResponse | null = null;
+
+const _getMenuData = async () => {
+	try {
+		Astro.props.refresh = resetCache;
+
+		// TODO: The following GET error is an Astro specific probleme,
+		// see https://github.com/withastro/astro/issues/8514
+		// @ts-ignore
+		const memoResp = (await GET(Astro)) as Response;
+		const memoResult = (await memoResp.json()) as APIMemoirsMenuResponse;
+
+		return memoResult;
+	} catch (e) {
+		console.error(e);
+
+		return null;
+	}
+};
+
+// menuData = await _getMenuData();
+// console.log(":: using cached menu data: ", menuData);
 ---
 
 <header>

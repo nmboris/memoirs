@@ -27,6 +27,17 @@ export interface APIMemoQueryResponse {
 	nextPage?: string;
 }
 
+export interface MemoirsMenuItem {
+	id: string;
+	title: string;
+	order: number;
+}
+
+export interface APIMemoirsMenuResponse {
+	cached: boolean;
+	data: MemoirsMenuItem[];
+}
+
 // MEMOS Types
 export interface ResourceItem {
 	id: number;
