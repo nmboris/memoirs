@@ -5,4 +5,26 @@ const baseProps = { title: "Homepage", description: "Welcome to my homepage" };
 const contentName = Astro.url.pathname === "/" ? "index" : Astro.url.pathname;
 ---
 
-<StaticPage {baseProps} {contentName} />
+<StaticPage class="myLayout" {baseProps} {contentName} />
+
+<style>
+	.myLayout {
+		max-width: var(--content-width);
+		margin-inline: auto;
+
+		& li {
+			margin-left: var(--space-4);
+		}
+	}
+
+	@media screen and (max-width: 720px) {
+		.myLayout {
+			max-width: 100%;
+			padding-inline: var(--space-4);
+		}
+
+		:global(.myLayout nav ul) {
+			margin: 0;
+		}
+	}
+</style>
