@@ -27,6 +27,13 @@ const _patchContentTags = (content: string) => {
 		'{% checkbox label="$3" status="$2" /%}'
 	);
 
+	// The content links
+	const contentLinkPattern = /\[\[(.+?)\]\]/gim;
+	replaced = replaced.replace(
+		contentLinkPattern,
+		'{% contentLink label="$1" %}$1{% /contentLink %}'
+	);
+
 	return replaced;
 };
 
