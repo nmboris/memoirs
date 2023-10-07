@@ -53,7 +53,8 @@ try {
 	// @ts-ignore
 	const memosResp = (await GET(Astro)) as Response;
 	const memoResult = (await memosResp.json()) as APIMemoQueryResponse;
-	// TODO: num of query results has to differ from search results!!
+
+	// TODO: limit of query results has to differ from search results!!
 
 	markdocsWithMeta = memoResult.data.map((memo) =>
 		parseMarkdoc(MemosAssetUrl, memo)
@@ -220,11 +221,11 @@ try {
 				if (item.dataset.docId === myHash) {
 					hashFound = true;
 					item.click();
+				} else {
+					menuItems[0].classList.add("active");
+					contentItems[0].classList.add("active");
 				}
 			});
-
-			// Click first menu item to show first content item
-			!hashFound && menuItems[0].click();
 		},
 		{ once: false }
 	);
