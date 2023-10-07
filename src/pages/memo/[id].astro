@@ -13,6 +13,8 @@ import type {
 } from "@lib/types";
 
 import { GET } from "@api/memo/[memoId].ts";
+import Backlinks from "@components/Backlinks.astro";
+import Link from "@components/markdoc/nodes/Link.astro";
 
 const { id } = Astro.params;
 
@@ -104,7 +106,7 @@ try {
 								{markdocMemo.imageUrl ? (
 									<img src={markdocMemo.imageUrl} alt="Hero" />
 								) : (
-									<hr />
+									(<></>)
 								)}
 							</div>
 
@@ -116,38 +118,38 @@ try {
 
 							<ContentRenderer doc={markdocMemo} />
 
+							{(relations?.length > 0 ||
+								markdocMemo.resourceList.length >0 ) ? <hr /> : <></>}
+
 							{markdocMemo.resourceList?.length > 0 && (
-								<div style="padding-top: var(--space-8);">
-									<em>Attachments</em>
-								</div>
+								<h6 style="padding-top: var(--space-4);">Attachments</h6>
 							)}
 							{markdocMemo.resourceList?.map((resource) => {
 								return (
 									<div class="ref">
-										<a target="_blank" href={`${MemosAssetUrl}/${resource.id}`}>
+										<Link href={`${MemosAssetUrl}/${resource.id}`}>
 											{resource.filename}
-										</a>
+										</Link>
 									</div>
 								);
 							})}
+
 							{relations?.length > 0 && (
-								<>
-									<hr />
-									<em>Related Content</em>
-								</>
+								<h6 style="padding-top: var(--space-4);">Relations</h6>
 							)}
 							{relations?.map((relation) => {
 								return (
 									<div class="ref">
-										<a href={`/memo/${relation?.relatedMemoId}`}>
+										<Link href={`/memo/${relation?.relatedMemoId}`}>
 											{relation?.title}
-										</a>
+										</Link>
 									</div>
 								);
 							})}
 						</div>
 					)
 				}
+				{markdocMemo && <Backlinks doc={markdocMemo} showDivider={relations?.length === 0 && markdocMemo.resourceList.length === 0} />}
 			</section>
 		</article>
 	</main>
@@ -155,11 +157,12 @@ try {
 
 <style>
 	hr {
-		width: 60%;
-		background-color: var(--color-text-2);
-		height: 1px;
+		width: 12rem;
+		background-color: var(--color-secondary);
+		height: 3px;
 		border: none;
-		margin: var(--space-8) auto;
+
+		margin: var(--space-16) 0 var(--space-1) 0;
 	}
 
 	section {
@@ -228,6 +231,11 @@ try {
 			margin-bottom: var(--space-1);
 			border-radius: var(--radius);
 		}
+	}
+
+	.ref {
+		font-size: calc(0.8 * var(--font-size-paragraph));
+		padding-left: var(--space-4);
 	}
 
 	@media (max-width: 720px) {
