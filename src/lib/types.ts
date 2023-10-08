@@ -26,6 +26,12 @@ export interface GlobalCacheMemoResult {
 	error: Error | null;
 }
 
+export interface GlobalCacheMemoResultList {
+	cacheHit: boolean;
+	memos: MemoWithMeta[] | null;
+	error: Error | null;
+}
+
 export interface APIMemoResponse {
 	cached: boolean;
 	data: Memo;
