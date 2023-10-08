@@ -1,24 +1,52 @@
 ---
-const { multiline, error, ...restProps } = Astro.props || {};
+type Props = {
+	multiline?: boolean;
+	info?: boolean;
+	error?: boolean;
+	hover?: boolean;
+	[key: string]: unknown;
+};
+
+const {
+	multiline = false,
+	hover = false,
+	info = false,
+	error = false,
+	...restProps
+} = Astro.props || {};
 
 const Element = multiline ? "div" : "span";
 ---
 
-<Element class:list={["source", { error }]} {...restProps}><slot /></Element>
+<Element class:list={["source", { info }, { error }, { hover }]} {...restProps}>
+	<slot />
+</Element>
 
 <style>
 	.source {
+		cursor: default;
+
 		color: rgba(21, 128, 61, 1);
 		background-color: rgba(240, 253, 244, 1);
 		border: 1px solid rgba(194, 235, 212, 1);
 
-		font-size: 0.8rem;
-		margin-bottom: 1rem;
-		border-radius: 6px;
-		padding: 0.2rem 0.6rem;
+		font-size: var(--font-size-small);
 
-		&:hover {
+		border-radius: var(--radius);
+		padding: 0 var(--space-2);
+
+		&.hover:hover {
 			background-color: rgb(187, 237, 209);
+		}
+	}
+
+	.source.info {
+		color: rgba(139, 86, 26, 1);
+		background-color: rgba(254, 252, 233, 1);
+		border: 1px solid rgba(243, 229, 191, 1);
+
+		&.hover:hover {
+			background-color: rgba(243, 229, 191, 1);
 		}
 	}
 
@@ -27,7 +55,7 @@ const Element = multiline ? "div" : "span";
 		background-color: rgba(254, 242, 242, 1);
 		border: 1px solid rgba(251, 220, 221, 1);
 
-		&:hover {
+		&.hover:hover {
 			background-color: rgb(251, 233, 233);
 		}
 	}

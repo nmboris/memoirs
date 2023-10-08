@@ -5,24 +5,26 @@ type Props = {
 	text: string;
 	href: string;
 	[key: string]: any;
+	multiline?: boolean;
 };
 
-const { text, href, ...restProps } = Astro.props;
+const { text, href, multiline = false, ...restProps } = Astro.props;
 ---
 
-<div class="badgeLink" {...restProps}>
-	<a href={href} type="button" target="_blank">
-		<Badge>{text}</Badge>
-	</a>
-</div>
+<a class="badgeLink" {...restProps} href={href} type="button" target="_blank">
+	<Badge style="cursor: pointer;" {multiline} hover={true}>{text} →</Badge>
+</a>
 
 <style>
-	div {
-		padding-bottom: 0.3rem;
+	.badgeLink {
+		font-size: var(--font-size-small);
+		display: inline-block;
+		cursor: pointer;
 	}
 
 	a {
 		color: inherit;
 		text-decoration: inherit;
+		font-size: var(--font-size-small);
 	}
 </style>
