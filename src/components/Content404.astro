@@ -10,52 +10,54 @@ type Props = {
 const { pageName, error } = Astro.props;
 ---
 
-{
-	error && (
-		<p>
-			<h1>An error has occurred while loading data</h1>
-			<Badge multiline error>
-				<p class="message">{error.message}</p>
-				<p>
-					If the error occurred due to misconfiguration, please
-					<a href="/admin">change the configuration</a>.
-				</p>
-			</Badge>
-		</p>
-	)
-}
+<main class="section">
+	{
+		error && (
+			<p>
+				<h1>An error has occurred while loading data</h1>
+				<Badge multiline error>
+					<p class="message">{error.message}</p>
+					<p>
+						If the error occurred due to misconfiguration, please
+						<a href="/admin">change the configuration</a>.
+					</p>
+				</Badge>
+			</p>
+		)
+	}
 
-{
-	!error && (
-		<div class="missingMemo">
-			<h1>🧑‍🚀 Hello, Memoirs!</h1>
+	{
+		!error && (
+			<div class="missingMemo">
+				<h1>🧑‍🚀 Hello, Memoirs!</h1>
 
-			<Badge style="margin-bottom: var(--space-8);" multiline error>
-				<div class="err404">404</div>
-				<p>Unfortunately we couldn't find any content for this page.</p>
-				<ul>
-					<li>Did you create a corresponding memo?</li>
-					<li>Did you set the memo's visibility state to PUBLIC?</li>
-				</ul>
-				<p />
-				<p>
-					If you don't have a memo for this page, create a memo in your memos
-					instance with at least the following Frontmatter information:
-				</p>
-			</Badge>
-			<Prism
-				code={`---
+				<Badge style="margin-bottom: var(--space-8);" multiline error>
+					<div class="err404">404</div>
+					<p>Unfortunately we couldn't find any content for this page.</p>
+					<ul>
+						<li>Did you create a corresponding memo?</li>
+						<li>Did you set the memo's visibility state to PUBLIC?</li>
+					</ul>
+					<p />
+					<p>
+						If you don't have a memo for this page, create a memo in your memos
+						instance with at least the following Frontmatter information:
+					</p>
+				</Badge>
+				<Prism
+					code={`---
 memoirs_page: ${pageName}
 title: ...Enter your page title here...
 ---
 # 🧑‍🚀 Hello, Headline
 
 This is the content of your page. You can use Markdown here.`}
-				lang="md"
-			/>
-		</div>
-	)
-}
+					lang="md"
+				/>
+			</div>
+		)
+	}
+</main>
 
 <style>
 	.err404 {

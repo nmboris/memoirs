@@ -1,5 +1,5 @@
 import type { APIContext, APIRoute } from "astro";
-import type { APIMemoQueryResponse, Memo, MemosHost } from "@lib/types";
+import type { Memo, MemosHost } from "@lib/types";
 import { getMemoServerCfg } from "@lib/apiHelper";
 
 const QUERY_LIMIT = import.meta.env.QUERY_LIMIT || "20";
@@ -22,8 +22,6 @@ export const GET: APIRoute = async (context: APIContext) => {
 		context.props.limit ?? searchParams.get("limit") ?? QUERY_LIMIT;
 	const limit = parseInt(limitStr);
 
-	const limitPlus = limit + 1;
-
 	const queryForTag = searchParams.has("tag")
 		? `tag=${searchParams.get("tag")}`
 		: null;
@@ -43,10 +41,9 @@ export const GET: APIRoute = async (context: APIContext) => {
 
 	const url = `${MemosApiUrl}/memo?rowStatus=${rowStat}&creatorUsername=${user}${
 		query ? `&${query}` : ""
-	}&limit=${limitPlus}${offset > 0 ? `&offset=${offset}` : ""}`;
+	}&limit=${limit}${offset > 0 ? `&offset=${offset}` : ""}`;
 
 	let json: Promise<Memo[]>;
-	let cached = false;
 
 	try {
 		const res = await fetch(url);

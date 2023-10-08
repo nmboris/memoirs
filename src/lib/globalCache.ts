@@ -40,6 +40,15 @@ export class GlobalCache {
 
 	private constructor() {
 		this._memoCache = new Map();
+
+		const debugOn = import.meta.env.MODE === "development";
+		if (debugOn) {
+			console.log(":: GlobalCache Debugging started ::");
+
+			setInterval(() => {
+				console.log(this.stats);
+			}, 1000 * 10 * 1); // Every 10 seconds
+		}
 	}
 
 	get stats() {
@@ -83,32 +92,41 @@ export class GlobalCache {
 		astroContext: APIContext<
 			Record<string, any>,
 			Record<string, string | undefined>
-		>,
-		id: string | undefined
+		>
 	): Promise<GlobalCacheMemoResult> {
+		const { id, content } = astroContext.props as {
+			id: string | null;
+			content: string | null;
+		};
+
 		let isCached = false;
 
-		if (!id || !astroContext || !this.getSystemURLs(astroContext))
+		if (
+			(!id && !content) ||
+			!astroContext ||
+			!this.getSystemURLs(astroContext)
+		) {
 			return Promise.resolve({
 				cacheHit: false,
 				memo: null,
 				relations: [],
-				error: new Error("No id or systemURLs"),
+				error: new Error("No id or content parameter or no systemURLs."),
 			});
+		}
 
 		// Handle cache
 		const cookieConfig = this._getCookieData(astroContext);
-		const cacheKey = `${cookieConfig?.host}§${cookieConfig?.user}§${id}`;
+		const cacheKey = `${cookieConfig?.host}§${cookieConfig?.user}§${id}_${content}}`;
 
 		if (this._memoCache.has(cacheKey)) {
 			const cacheItem = this._memoCache.get(cacheKey)! as PageCacheItem;
 			const cacheTimeout = cacheItem.timeout;
 
-			console.log(
-				":: CACHED MEMO ITEM FOUND ::",
-				new Date(cacheTimeout),
-				cacheKey
-			);
+			// console.log(
+			// 	":: CACHED MEMO ITEM FOUND ::",
+			// 	new Date(cacheTimeout),
+			// 	cacheKey
+			// );
 
 			if (cacheItem.memo && Date.now() < cacheTimeout) {
 				isCached = true;
@@ -120,7 +138,7 @@ export class GlobalCache {
 					error: null,
 				};
 			} else {
-				console.log(":: CACHED MEMO ITEM REMOVED ::", cacheKey);
+				// console.log(":: CACHED MEMO ITEM REMOVED ::", cacheKey);
 				this._memoCache.delete(cacheKey);
 			}
 		}
@@ -130,8 +148,6 @@ export class GlobalCache {
 		let error: Error | null = null;
 
 		try {
-			astroContext.params.memoId = id;
-
 			// TODO: The following GET error is an Astro specific probleme,
 			// see https://github.com/withastro/astro/issues/8514
 			// @ts-ignore
@@ -146,7 +162,8 @@ export class GlobalCache {
 			relations = await Promise.all(
 				// TODO: try catch
 				markdocMemo.relationList.map(async (relation) => {
-					const memo = this.getMemo(astroContext, "" + relation.relatedMemoId);
+					astroContext.props.id = "" + relation.relatedMemoId;
+					const memo = this.getMemo(astroContext);
 					const result: ResolvedRelation = {
 						...relation,
 						title: (await memo).memo?.title || "Untitled",
@@ -158,7 +175,7 @@ export class GlobalCache {
 
 			const timeout = Date.now() + 1000 * 60 * 1; // 5 minutes
 
-			console.log(":: CACHE MEMO ITEM ADDED ::", new Date(timeout), cacheKey);
+			// console.log(":: CACHE MEMO ITEM ADDED ::", new Date(timeout), cacheKey);
 
 			this._memoCache.set(cacheKey, {
 				memo: markdocMemo,
@@ -184,7 +201,7 @@ export class GlobalCache {
 			Record<string, string | undefined>
 		>
 	) {
-		const { tag, content } = astroContext.props;
+		const { tag, content, filterPages = true } = astroContext.props;
 		let isCached = false;
 
 		if (!astroContext || !this.getSystemURLs(astroContext))
@@ -204,12 +221,12 @@ export class GlobalCache {
 			const cacheItems = this._memoCache.get(cacheKey)! as PageCacheItemList;
 			const cacheTimeout = cacheItems.timeout;
 
-			console.log(
-				":: CACHED ITEM LIST FOUND ::",
-				new Date(cacheTimeout),
-				cacheKey,
-				cacheItems.memoList.length
-			);
+			// console.log(
+			// 	":: CACHED ITEM LIST FOUND ::",
+			// 	new Date(cacheTimeout),
+			// 	cacheKey,
+			// 	cacheItems.memoList.length
+			// );
 
 			if (cacheItems.memoList && Date.now() < cacheTimeout) {
 				isCached = true;
@@ -220,7 +237,7 @@ export class GlobalCache {
 					error: null,
 				} as GlobalCacheMemoResultList;
 			} else {
-				console.log(":: CACHED ITEM LIST REMOVED ::", cacheKey);
+				// console.log(":: CACHED ITEM LIST REMOVED ::", cacheKey);
 				this._memoCache.delete(cacheKey);
 			}
 		}
@@ -239,11 +256,13 @@ export class GlobalCache {
 				parseMarkdoc(this.getSystemURLs(astroContext)!.MemosAssetUrl, memo)
 			);
 
-			markdocMemos = filterOutPages(allMarkdocMemos);
+			markdocMemos = filterPages
+				? filterOutPages(allMarkdocMemos)
+				: allMarkdocMemos;
 
 			const timeout = Date.now() + 1000 * 60 * 1; // 5 minutes
 
-			console.log(":: CACHE ITEM LIST ADDED ::", new Date(timeout), cacheKey);
+			// console.log(":: CACHE ITEM LIST ADDED ::", new Date(timeout), cacheKey);
 
 			const newItem: PageCacheItemList = {
 				memoList: markdocMemos,

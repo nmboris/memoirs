@@ -1,18 +1,12 @@
 ---
-import type {
-	APIMemoQueryResponse,
-	BaseLayoutProps,
-	MemoWithMeta,
-	MemosHost,
-} from "@lib/types";
+import type { BaseLayoutProps } from "@lib/types";
+
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { parseMarkdoc } from "@lib/markdocHelpers";
-import { getMemoServerCfg } from "@lib/apiHelper";
 import Content404 from "@components/Content404.astro";
-import { GET } from "@api/memos.ts";
 import BadgeLink from "@components/BadgeLink.astro";
 import ContentRenderer from "@components/markdoc/render/ContentRenderer.astro";
-import BaseHead from "./BaseHead.astro";
+import { GlobalCache } from "@lib/globalCache";
+import type { APIContext } from "astro";
 
 type Props = {
 	baseProps: BaseLayoutProps;
@@ -24,50 +18,38 @@ type Props = {
 
 const { baseProps, contentName, ...restProps } = Astro.props;
 
-const memoHostData = Astro.cookies
-	.get("memoirs.memos.host")!
-	.json() as MemosHost; // Set in middleware
-const { MemosSourceUrl, MemosAssetUrl } = getMemoServerCfg(
-	Astro.url.origin,
-	memoHostData
-);
+// TODO: Hack, for compatibility see https://docs.astro.build/en/reference/api-reference/#endpoint-context
+const astro = Astro as unknown as APIContext;
 
-let error: Error | null = null;
-let myPageMemo: MemoWithMeta | null = null;
+Astro.props.content = `memoirs_page: ${contentName}`;
+Astro.props.filterPages = false;
 
-try {
-	Astro.props.content = `memoirs_page: ${contentName}`;
+const data = await GlobalCache.getInstance().getMemoList(astro);
+const page = data.memos ? data.memos[0] : undefined;
 
-	// TODO: The following GET error is an Astro specific probleme,
-	// see https://github.com/withastro/astro/issues/8514
-	// @ts-ignore
-	const memosResp = (await GET(Astro)) as Response;
-	const memosJson = (await memosResp.json()) as APIMemoQueryResponse;
-
-	if (memosJson && memosJson.data.length) {
-		myPageMemo = parseMarkdoc(MemosAssetUrl, memosJson.data[0]);
-	}
-
-	baseProps.title = myPageMemo?.title || baseProps.title;
-	baseProps.description = myPageMemo?.abstract || baseProps.description;
-} catch (e) {
-	console.error(e);
-	error = e as Error;
-}
+const theBaseProps = {
+	...baseProps,
+	title: page?.title ?? "memoirs",
+	description: page?.abstract ?? "A blogging service for usememos.com",
+};
 ---
 
-<BaseLayout {...baseProps}>
+<BaseLayout {...theBaseProps}>
+	{!page && <Content404 pageName={contentName} error={data.error} />}
 	<main {...restProps}>
 		{
-			myPageMemo && (
-				<BadgeLink
-					style="margin-top: var(--space-4);"
-					text="Link to memos original page"
-					href={`${MemosSourceUrl}/${myPageMemo.id}`}
-				/>
+			page && (
+				<>
+					<BadgeLink
+						style="margin-top: var(--space-4);"
+						text="Link to memos original page"
+						href={`${
+							GlobalCache.getInstance().getSystemURLs(astro)!.MemosSourceUrl
+						}/${page.id}`}
+					/>
+					<ContentRenderer doc={page} />
+				</>
 			)
 		}
-		{!myPageMemo && <Content404 pageName={contentName} {error} />}
-		{myPageMemo && <ContentRenderer doc={myPageMemo} />}
 	</main>
 </BaseLayout>

@@ -9,17 +9,15 @@ type Props = {
 	doc: MemoWithMeta;
 	showDivider?: boolean;
 	content?: string;
+	filterPages?: boolean;
 };
 
 const { doc, showDivider=false } = Astro.props;
 const slug = doc.frontmatter.memoirs_slug;
 
-console.log(":: SLUG", slug, doc.frontmatter);
-
-let markdocsWithMeta: MemoWithMeta[] = [];
-
 const content = `[[${slug}]]`;
 Astro.props.content = content;
+Astro.props.filterPages = false;
 
 // TODO: Hack, for compatibility see https://docs.astro.build/en/reference/api-reference/#endpoint-context
 const astro = Astro as unknown as APIContext;
@@ -37,7 +35,7 @@ const data = await GlobalCache.getInstance().getMemoList(astro) as GlobalCacheMe
 			)}
 			<h6 style="padding-top: var(--space-4);">Backlinks</h6>
 			<ul>
-				{markdocsWithMeta.map((mdoc) => (
+				{data.memos.map((mdoc) => (
 					<li>
 						<Link href={`/memo/${mdoc.id}`}>{mdoc.title}</Link>
 					</li>

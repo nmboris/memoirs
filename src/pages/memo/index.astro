@@ -11,8 +11,6 @@ import Card from "@components/Card.astro";
 const astro = Astro as unknown as APIContext;
 const data = await GlobalCache.getInstance().getMemoList(astro) as GlobalCacheMemoResultList;
 
-console.log(":: OVERVIEW: Num of memos:", data.memos?.length);
-
 const baseProps = {
 	title: "memoirs",
 	description: "A blogging service for usememos.com",

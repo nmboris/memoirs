@@ -1,11 +1,10 @@
 ---
-import type { MemosHost, MemoWithMeta, APIMemoQueryResponse } from "@lib/types";
-import { getMemoServerCfg } from "@lib/apiHelper";
-import { parseMarkdoc } from "@lib/markdocHelpers";
-import { GET } from "@api/memos.ts";
+import type { MemoWithMeta } from "@lib/types";
 
 import ContentRenderer from "../render/ContentRenderer.astro";
 import BadgeLink from "@components/BadgeLink.astro";
+import { GlobalCache } from "@lib/globalCache";
+import type { APIContext } from "astro";
 
 /**
  * THIS COMPONENT USES CLIENT SIDE JS TO RENDER THE SIDENAV
@@ -29,58 +28,39 @@ type Props = {
 	tag: string;
 	gap: string;
 	content: string;
+	filterPages: boolean;
 };
 
 const { tag, gap } = Astro.props;
 
-const memoHostData = Astro.cookies
-	.get("memoirs.memos.host")!
-	.json() as MemosHost; // Set in middleware
-
-const { MemosAssetUrl, MemosSourceUrl } = getMemoServerCfg(
-	Astro.url.origin,
-	memoHostData
-);
+// TODO: Hack, for compatibility see https://docs.astro.build/en/reference/api-reference/#endpoint-context
+const astro = Astro as unknown as APIContext;
 
 let markdocsWithMeta: MemoWithMeta[] = [];
-let error: Error | null = null;
 
-try {
-	Astro.props.content = `memoirs_sidenav: ${tag}`;
+Astro.props.content = `memoirs_sidenav: ${tag}`;
+Astro.props.filterPages = false;
 
-	// TODO: The following GET error is an Astro specific probleme,
-	// see https://github.com/withastro/astro/issues/8514
-	// @ts-ignore
-	const memosResp = (await GET(Astro)) as Response;
-	const memoResult = (await memosResp.json()) as APIMemoQueryResponse;
+const resultList = await GlobalCache.getInstance().getMemoList(astro);
+markdocsWithMeta = resultList.memos || [];
 
-	// TODO: limit of query results has to differ from search results!!
+markdocsWithMeta.sort((a, b) => {
+	const tagA = a.frontmatter.memoirs_sidenav as string;
+	const tagB = b.frontmatter.memoirs_sidenav as string;
 
-	markdocsWithMeta = memoResult.data.map((memo) =>
-		parseMarkdoc(MemosAssetUrl, memo)
-	);
+	const tagIndexA = tagA
+		? tagA.split(",")[1]
+			? parseInt(tagA.split(",")[1])
+			: -1
+		: -1;
+	const tagIndexB = tagB
+		? tagB.split(",")[1]
+			? parseInt(tagB.split(",")[1])
+			: -1
+		: -1;
 
-	markdocsWithMeta.sort((a, b) => {
-		const tagA = a.frontmatter.memoirs_sidenav as string;
-		const tagB = b.frontmatter.memoirs_sidenav as string;
-
-		const tagIndexA = tagA
-			? tagA.split(",")[1]
-				? parseInt(tagA.split(",")[1])
-				: -1
-			: -1;
-		const tagIndexB = tagB
-			? tagB.split(",")[1]
-				? parseInt(tagB.split(",")[1])
-				: -1
-			: -1;
-
-		return tagIndexA - tagIndexB;
-	});
-} catch (e) {
-	error = e as Error;
-	console.error(e);
-}
+	return tagIndexA - tagIndexB;
+});
 ---
 
 <div class="sidenav">
@@ -102,7 +82,9 @@ try {
 					<BadgeLink
 						style="display: block; padding-left: var(--space-4); padding-bottom: var(--space-4);"
 						text="Link to memos original page"
-						href={`${MemosSourceUrl}/${mdoc.id}`}
+						href={`${
+							GlobalCache.getInstance().getSystemURLs(astro)!.MemosSourceUrl
+						}/${mdoc.id}`}
 					/>
 
 					<ContentRenderer doc={mdoc} />

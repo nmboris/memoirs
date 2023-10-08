@@ -1,15 +1,10 @@
 ---
-// import type { CookieData, MemoWithMeta } from "@lib/types";
-// import { doTagSearch, doContentSearch } from "@lib/memosHandler";
-// import { parse } from "@lib/markdocParser";
+import type { APIContext } from "astro";
+import type { MemoWithMeta } from "@lib/types";
+import { GlobalCache } from "@lib/globalCache";
 
 import Box from "@components/Box.astro";
 import Content404 from "@components/Content404.astro";
-import { getMemoServerCfg } from "@lib/apiHelper";
-import { filterOutPages, parseMarkdoc } from "@lib/markdocHelpers";
-import type { APIMemoQueryResponse, MemoWithMeta, MemosHost } from "@lib/types";
-
-import { GET } from "@api/memos.ts";
 
 export const searchbox = {
 	render: "SearchBox",
@@ -40,40 +35,40 @@ type Props = {
 	type: "tag" | "content";
 	count: number;
 	limit?: number;
+	tag?: string;
+	content?: string;
+	filterPages?: boolean;
 };
 
-const { title, query, count } = Astro.props;
+const { title, type, query, count } = Astro.props;
 
-const memoHostData = Astro.cookies
-	.get("memoirs.memos.host")!
-	.json() as MemosHost; // Set in middleware
+// TODO: Hack, for compatibility see https://docs.astro.build/en/reference/api-reference/#endpoint-context
+const astro = Astro as unknown as APIContext;
 
-const { MemosAssetUrl } = getMemoServerCfg(Astro.url.origin, memoHostData);
-
-let markDocWithMeta: MemoWithMeta[] = [];
 let error: Error | null = null;
 
-try {
-	Astro.props.query = query;
-	Astro.props.limit = 30; // TODO: Workaround for the problem, finding Pages in result aka. no filtering
+switch (type) {
+	case "tag":
+		if (!query) {
+			error = new Error("No query");
+		}
 
-	// TODO: The following GET error is an Astro specific probleme,
-	// see https://github.com/withastro/astro/issues/8514
-	// @ts-ignore
-	const memosResp = (await GET(Astro)) as Response;
-	const memoResult = (await memosResp.json()) as APIMemoQueryResponse;
-
-	// TODO: num of query results has to differ from search results!!
-
-	markDocWithMeta = memoResult.data.map((memo) =>
-		parseMarkdoc(MemosAssetUrl, memo)
-	);
-
-	markDocWithMeta = filterOutPages(markDocWithMeta).slice(0, count);
-} catch (e) {
-	error = e as Error;
-	console.error(e);
+		Astro.props.tag = query;
+		break;
+	case "content":
+		if (!query) {
+			error = new Error("No query");
+		}
+		Astro.props.content = query;
+		break;
+	default:
+		error = new Error("Unknown type");
 }
+
+Astro.props.limit = count;
+Astro.props.filterPages = false;
+
+const resultList = await GlobalCache.getInstance().getMemoList(astro);
 ---
 
 <Box style="background-color: white;">
@@ -81,27 +76,29 @@ try {
 	<ul>
 		{error && <Content404 pageName={""} {error} />}
 		{
-			markDocWithMeta.map((md) => (
-				<li>
-					<h2>
-						<a href={`/memo/${md.id}`}>{md.title || "Memo"}</a>
-						<span>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								width="24"
-								height="24"
-								viewBox="0 0 24 24"
-							>
-								<path
-									fill="currentColor"
-									d="M17.92 11.62a1 1 0 0 0-.21-.33l-5-5a1 1 0 0 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l5-5a1 1 0 0 0 .21-.33a1 1 0 0 0 0-.76Z"
-								/>
-							</svg>
-						</span>
-					</h2>
-					<p class="abstract">{md.abstract}</p>
-				</li>
-			))
+			resultList &&
+				resultList.memos &&
+				resultList.memos.map((md) => (
+					<li>
+						<h2>
+							<a href={`/memo/${md.id}`}>{md.title || "Memo"}</a>
+							<span>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="24"
+									height="24"
+									viewBox="0 0 24 24"
+								>
+									<path
+										fill="currentColor"
+										d="M17.92 11.62a1 1 0 0 0-.21-.33l-5-5a1 1 0 0 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1 1 0 0 0 0 1.42a1 1 0 0 0 1.42 0l5-5a1 1 0 0 0 .21-.33a1 1 0 0 0 0-.76Z"
+									/>
+								</svg>
+							</span>
+						</h2>
+						<p class="abstract">{md.abstract}</p>
+					</li>
+				))
 		}
 	</ul>
 </Box>

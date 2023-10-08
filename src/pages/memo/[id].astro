@@ -1,24 +1,22 @@
 ---
-import BadgeLink from "@components/BadgeLink.astro";
-import Content404 from "@components/Content404.astro";
+import type { APIContext } from "astro";
+import { GlobalCache } from "@lib/globalCache";
+
 import ContentRenderer from "@components/markdoc/render/ContentRenderer.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
-import { getMemoServerCfg } from "@lib/apiHelper";
-import type {
-	MemosHost,
-} from "@lib/types";
 
+import BadgeLink from "@components/BadgeLink.astro";
+import Content404 from "@components/Content404.astro";
 import Backlinks from "@components/Backlinks.astro";
 import Link from "@components/markdoc/nodes/Link.astro";
-import { GlobalCache } from "@lib/globalCache";
-import type { APIContext } from "astro";
 import Badge from "@components/Badge.astro";
 
 const { id } = Astro.params;
 
 // TODO: Hack, for compatibility see https://docs.astro.build/en/reference/api-reference/#endpoint-context
 const astro = Astro as unknown as APIContext;
-const data = await GlobalCache.getInstance().getMemo(astro, id)
+Astro.props.id = id;
+const data = await GlobalCache.getInstance().getMemo(astro)
 
 const baseProps = { title: data.memo?.title ?? "memoirs", description: data.memo?.abstract ?? "A blogging service for usememos.com" };
 
