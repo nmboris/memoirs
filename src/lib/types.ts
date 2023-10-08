@@ -4,6 +4,11 @@ export interface BaseLayoutProps {
 	image?: string;
 }
 
+export interface CookieData {
+	host: string;
+	user: string;
+}
+
 export interface MemosHost {
 	host: string;
 	user: string;
@@ -12,6 +17,13 @@ export interface MemosHost {
 	MemosAssetUrl: string;
 	LocalSingleMemoApiUrl: string;
 	LocalSearchMemosApiUrl: string;
+}
+
+export interface GlobalCacheMemoResult {
+	cacheHit: boolean;
+	memo: MemoWithMeta | null;
+	relations: ResolvedRelation[];
+	error: Error | null;
 }
 
 export interface APIMemoResponse {

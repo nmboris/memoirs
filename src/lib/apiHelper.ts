@@ -1,8 +1,9 @@
-import type { MemosHost } from "./types";
+import type { CookieData, MemosHost } from "./types";
 
+// FIXME: MemosHost type must be removed later, it's only here for compatibility
 export const getMemoServerCfg = (
 	myselfOrigin: string,
-	memosHost: MemosHost
+	memosHost: MemosHost | CookieData
 ) => {
 	const hostRaw = memosHost.host;
 	const remoteHost = hostRaw.endsWith("/") ? hostRaw.slice(0, -1) : hostRaw;

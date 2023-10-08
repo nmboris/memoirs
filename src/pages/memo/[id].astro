@@ -4,28 +4,22 @@ import Content404 from "@components/Content404.astro";
 import ContentRenderer from "@components/markdoc/render/ContentRenderer.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { getMemoServerCfg } from "@lib/apiHelper";
-import { parseMarkdoc, resolveRelations } from "@lib/markdocHelpers";
 import type {
-	APIMemoResponse,
-	MemoWithMeta,
 	MemosHost,
-	ResolvedRelation,
 } from "@lib/types";
 
-import { GET } from "@api/memo/[memoId].ts";
 import Backlinks from "@components/Backlinks.astro";
 import Link from "@components/markdoc/nodes/Link.astro";
+import { GlobalCache } from "@lib/globalCache";
+import type { APIContext } from "astro";
 
 const { id } = Astro.params;
 
-const memoHostData = Astro.cookies
-	.get("memoirs.memos.host")!
-	.json() as MemosHost; // Set in middleware
+// TODO: Hack, for compatibility see https://docs.astro.build/en/reference/api-reference/#endpoint-context
+const astro = Astro as unknown as APIContext;
+const data = await GlobalCache.getInstance().getMemo(astro, id)
 
-const { MemosSourceUrl, MemosAssetUrl, LocalSingleMemoApiUrl } =
-	getMemoServerCfg(Astro.url.origin, memoHostData);
-
-const baseProps = { title: "memoirs", description: "A blogging service for usememos.com" };
+const baseProps = { title: data.memo?.title ?? "memoirs", description: data.memo?.abstract ?? "A blogging service for usememos.com" };
 
 const localDateOptions: Intl.DateTimeFormatOptions = {
 	weekday: "long",
@@ -39,47 +33,21 @@ const localDateOptionsMobile: Intl.DateTimeFormatOptions = {
 	month: "long",
 	day: "numeric",
 };
-
-let error: Error | null = null;
-let markdocMemo: MemoWithMeta | null = null;
-let relations: ResolvedRelation[] = [];
-
-try {
-	Astro.params.memoId = id;
-
-	// TODO: The following GET error is an Astro specific probleme,
-	// see https://github.com/withastro/astro/issues/8514
-	// @ts-ignore
-	const memoResp = (await GET(Astro)) as Response;
-	const memoResult = (await memoResp.json()) as APIMemoResponse;
-
-	markdocMemo = parseMarkdoc(MemosAssetUrl, memoResult.data);
-	relations = await resolveRelations(
-		LocalSingleMemoApiUrl,
-		MemosAssetUrl,
-		markdocMemo.relationList
-	);
-
-	baseProps.title = markdocMemo.title;
-	baseProps.description = markdocMemo.frontmatter.description as string || markdocMemo.abstract || baseProps.description;
-} catch (e) {
-	console.error(e);
-	error = e as Error;
-}
 ---
 
 <BaseLayout {...baseProps}>
 	<main class="section">
 		<article>
-			
-				{error && <Content404 pageName={""} {error} />}
+			{ data.error ? (<div><Content404 pageName={""} error={data.error} /></div>) : (<></>) }
+				
 				{
-					markdocMemo && (
+					data.memo ? (
 						<div class="content">
-							<h1>{markdocMemo.title}</h1>
+							<h1>{data.memo.title}</h1>
 							<div class="metadata">
 								<div>
-									{markdocMemo.creatorName}
+									{data.memo.creatorName}
+									{data.cacheHit ? "(cached)" : "NOT cached"}
 									<svg
 										stroke="currentColor"
 										fill="currentColor"
@@ -93,13 +61,13 @@ try {
 										</>
 									</svg>
 									<span class="showDesktop">
-										{new Date(markdocMemo.updatedTs * 1000).toLocaleDateString(
+										{new Date(data.memo.updatedTs * 1000).toLocaleDateString(
 											undefined,
 											localDateOptions
 										)}
 									</span>
 									<span class="showMobile">
-										{new Date(markdocMemo.updatedTs * 1000).toLocaleDateString(
+										{new Date(data.memo.updatedTs * 1000).toLocaleDateString(
 											undefined,
 											localDateOptionsMobile
 										)}
@@ -107,8 +75,8 @@ try {
 								</div>
 							</div>
 							<div class="hero-image">
-								{markdocMemo.imageUrl ? (
-									<img src={markdocMemo.imageUrl} alt="Hero" />
+								{data.memo.imageUrl ? (
+									<img src={data.memo.imageUrl} alt="Hero" />
 								) : (
 									(<></>)
 								)}
@@ -117,31 +85,31 @@ try {
 							<BadgeLink
 								style="margin-inline: auto; margin-bottom: var(--space-8);"
 								text="Visit memos' source page →"
-								href={`${MemosSourceUrl}/${markdocMemo.id}`}
+								href={`${GlobalCache.getInstance().getSystemURLs(astro)!.MemosSourceUrl}/${data.memo.id}`}
 							/>
 
-							<ContentRenderer doc={markdocMemo} />
+							<ContentRenderer doc={data.memo} />
 
-							{(relations?.length > 0 ||
-								markdocMemo.resourceList.length >0 ) ? <hr /> : <></>}
+							{(data.relations?.length > 0 ||
+								data.memo.resourceList.length >0 ) ? <hr /> : <></>}
 
-							{markdocMemo.resourceList?.length > 0 && (
+							{data.memo.resourceList?.length > 0 && (
 								<h6 style="padding-top: var(--space-4);">Attachments</h6>
 							)}
-							{markdocMemo.resourceList?.map((resource) => {
+							{data.memo.resourceList?.map((resource) => {
 								return (
 									<div class="ref">
-										<Link href={`${MemosAssetUrl}/${resource.id}`}>
+										<Link href={`${GlobalCache.getInstance().getSystemURLs(astro)!.MemosAssetUrl}/${resource.id}`}>
 											{resource.filename}
 										</Link>
 									</div>
 								);
 							})}
 
-							{relations?.length > 0 && (
+							{data.relations?.length > 0 && (
 								<h6 style="padding-top: var(--space-4);">Relations</h6>
 							)}
-							{relations?.map((relation) => {
+							{data.relations?.map((relation) => {
 								return (
 									<div class="ref">
 										<Link href={`/memo/${relation?.relatedMemoId}`}>
@@ -151,9 +119,10 @@ try {
 								);
 							})}
 						</div>
-					)
+					) : (<></>)
+					
 				}
-				{markdocMemo && <Backlinks doc={markdocMemo} showDivider={relations?.length === 0 && markdocMemo.resourceList.length === 0} />}
+				{data.memo && <Backlinks doc={data.memo} showDivider={data.relations?.length === 0 && data.memo.resourceList.length === 0} />}
 		</article>
 	</main>
 </BaseLayout>

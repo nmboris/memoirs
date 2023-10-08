@@ -120,28 +120,6 @@ export const _getMemoAbstract = (
 	return "No abstract";
 };
 
-export const resolveRelations = async (
-	localSingleApiUrl: string,
-	apiContentUrl: string,
-	relationList: Relation[]
-) =>
-	await Promise.all(
-		// TODO: try catch
-		relationList.map(async (relation) => {
-			const memoResp = await fetch(
-				`${localSingleApiUrl}/${relation.relatedMemoId}`
-			);
-			const memoResult = await memoResp.json();
-			const markdocMemo = parseMarkdoc(apiContentUrl, memoResult.data);
-			const title = markdocMemo.title;
-
-			return {
-				...relation,
-				title,
-			} as ResolvedRelation;
-		})
-	);
-
 /**
  * Filters out memos of type page
  * @param memoList The list of memos to filter
