@@ -12,6 +12,7 @@ import Backlinks from "@components/Backlinks.astro";
 import Link from "@components/markdoc/nodes/Link.astro";
 import { GlobalCache } from "@lib/globalCache";
 import type { APIContext } from "astro";
+import Badge from "@components/Badge.astro";
 
 const { id } = Astro.params;
 
@@ -82,12 +83,14 @@ const localDateOptionsMobile: Intl.DateTimeFormatOptions = {
 								)}
 							</div>
 
+							<div style="display: flex; gap: var(--space-2); font-size: var(--font-size-small); margin-block: var(--space-8);">
 							<BadgeLink
-								style="margin-inline: auto; margin-bottom: var(--space-8);"
-								text="Visit memos' source page →"
+								multiline
+								text="Visit memos' source page"
 								href={`${GlobalCache.getInstance().getSystemURLs(astro)!.MemosSourceUrl}/${data.memo.id}`}
 							/>
-
+							<Badge multiline info>{data.cacheHit ? "Cached" : "NOT cached"}</Badge>
+						</div>
 							<ContentRenderer doc={data.memo} />
 
 							{(data.relations?.length > 0 ||
@@ -210,11 +213,6 @@ const localDateOptionsMobile: Intl.DateTimeFormatOptions = {
 			width: 100%;
 			display: grid;
 			grid-template-columns: 1fr auto auto;
-		}
-
-		.badgeLink {
-			text-align: center;
-			margin-top: var(--space-2);
 		}
 	}
 </style>
