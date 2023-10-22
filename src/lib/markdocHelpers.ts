@@ -1,10 +1,4 @@
-import type {
-	Memo,
-	MemoWithMeta,
-	Relation,
-	ResolvedRelation,
-	ResourceItem,
-} from "./types";
+import type { Memo, MemoWithMeta, ResourceItem } from "./types";
 import matter from "gray-matter";
 
 const tagRegexp = new RegExp(/(#([^\s#,]+))/, "g");

@@ -7,6 +7,8 @@ type CacheItem = {
 	cachedAt: number;
 };
 
+const debugOn = import.meta.env.MODE === "development";
+
 // Global cache for memo pages with timeout after a configured time
 const _globalMenuCache = new Map<string, CacheItem>();
 
@@ -31,7 +33,7 @@ export const GET: APIRoute = async (context: APIContext) => {
 
 	// If refresh param was set, delete the cache for this memo result
 	if (refresh) {
-		console.log(`:: Deleting cache for ${url}`);
+		// console.log(`:: Deleting cache for ${url}`);
 		_globalMenuCache.delete(url);
 	}
 
@@ -41,7 +43,9 @@ export const GET: APIRoute = async (context: APIContext) => {
 		const cacheTimeout = PAGE_CACHE_TIMEOUT;
 
 		if (cacheItem.cachedAt + cacheTimeout < Date.now()) {
-			// console.info(`:: Cache item timed out: Deleting cache for ${url}`);
+			if (debugOn) {
+				console.info(`:: Cache item timed out: Deleting cache for ${url}`);
+			}
 			_globalMenuCache.delete(url);
 		}
 	}

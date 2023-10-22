@@ -10,9 +10,10 @@ type Props = {
 	showDivider?: boolean;
 	content?: string;
 	filterPages?: boolean;
+	class?: string;
 };
 
-const { doc, showDivider=false } = Astro.props;
+const { doc, class:className, showDivider=false } = Astro.props;
 const slug = doc.frontmatter.memoirs_slug;
 
 const content = `[[${slug}]]`;
@@ -36,7 +37,7 @@ const data = await GlobalCache.getInstance().getMemoList(astro) as GlobalCacheMe
 			<h6 style="padding-top: var(--space-4);">Backlinks</h6>
 			<ul>
 				{data.memos.map((mdoc) => (
-					<li>
+					<li class="ref">
 						<Link href={`/memo/${mdoc.id}`}>{mdoc.title}</Link>
 					</li>
 				))}
@@ -55,7 +56,7 @@ const data = await GlobalCache.getInstance().getMemoList(astro) as GlobalCacheMe
 	}
 
 	li {
-		margin-left: var(--space-4);
+		margin-left: 0;
 	}
 
 	hr {

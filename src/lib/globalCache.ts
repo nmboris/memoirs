@@ -9,7 +9,6 @@ import type {
 	Memo,
 	MemoWithMeta,
 	MemosHost,
-	ResolvedRelation,
 } from "./types";
 import { filterOutPages, parseMarkdoc } from "./markdocHelpers";
 import { getMemoServerCfg } from "./apiHelper";
@@ -22,7 +21,6 @@ import { GET as GET_MEMO_LIST } from "@api/memos.ts";
 
 type PageCacheItem = {
 	memo: MemoWithMeta;
-	relations: ResolvedRelation[];
 	timeout: number;
 };
 
@@ -134,7 +132,6 @@ export class GlobalCache {
 				return {
 					cacheHit: isCached,
 					memo: cacheItem.memo,
-					relations: cacheItem.relations,
 					error: null,
 				};
 			} else {
@@ -144,7 +141,6 @@ export class GlobalCache {
 		}
 
 		let markdocMemo: MemoWithMeta | null = null;
-		let relations: ResolvedRelation[] = [];
 		let error: Error | null = null;
 
 		try {
@@ -159,27 +155,12 @@ export class GlobalCache {
 				memoResult
 			);
 
-			relations = await Promise.all(
-				// TODO: try catch
-				markdocMemo.relationList.map(async (relation) => {
-					astroContext.props.id = "" + relation.relatedMemoId;
-					const memo = this.getMemo(astroContext);
-					const result: ResolvedRelation = {
-						...relation,
-						title: (await memo).memo?.title || "Untitled",
-					};
-
-					return result;
-				})
-			);
-
 			const timeout = Date.now() + 1000 * 60 * 1; // 5 minutes
 
 			// console.log(":: CACHE MEMO ITEM ADDED ::", new Date(timeout), cacheKey);
 
 			this._memoCache.set(cacheKey, {
 				memo: markdocMemo,
-				relations,
 				timeout,
 			});
 		} catch (e) {
@@ -189,7 +170,6 @@ export class GlobalCache {
 			return {
 				cacheHit: isCached,
 				memo: markdocMemo,
-				relations,
 				error,
 			} as GlobalCacheMemoResult;
 		}

@@ -16,6 +16,7 @@ const { id } = Astro.params;
 // TODO: Hack, for compatibility see https://docs.astro.build/en/reference/api-reference/#endpoint-context
 const astro = Astro as unknown as APIContext;
 Astro.props.id = id;
+
 const data = await GlobalCache.getInstance().getMemo(astro)
 
 const baseProps = { title: data.memo?.title ?? "memoirs", description: data.memo?.abstract ?? "A blogging service for usememos.com" };
@@ -86,16 +87,24 @@ const localDateOptionsMobile: Intl.DateTimeFormatOptions = {
 								text="Visit memos' source page"
 								href={`${GlobalCache.getInstance().getSystemURLs(astro)!.MemosSourceUrl}/${data.memo.id}`}
 							/>
-							<Badge multiline info>{data.cacheHit ? "Cached" : "NOT cached"}</Badge>
-						</div>
+								<Badge multiline info>{data.cacheHit ? "Cached" : "NOT cached"}</Badge>
+							</div>
+							
 							<ContentRenderer doc={data.memo} />
 
-							{(data.relations?.length > 0 ||
-								data.memo.resourceList.length >0 ) ? <hr /> : <></>}
+							{
+								(
+									data.memo.relationList.length > 0 
+									||
+									data.memo.resourceList.length > 0 
+								) 
+								? <hr /> : <></>
+							}
 
 							{data.memo.resourceList?.length > 0 && (
 								<h6 style="padding-top: var(--space-4);">Attachments</h6>
 							)}
+
 							{data.memo.resourceList?.map((resource) => {
 								return (
 									<div class="ref">
@@ -106,24 +115,42 @@ const localDateOptionsMobile: Intl.DateTimeFormatOptions = {
 								);
 							})}
 
-							{data.relations?.length > 0 && (
+							{data.memo.relationList.length > 0 && (
 								<h6 style="padding-top: var(--space-4);">Relations</h6>
 							)}
-							{data.relations?.map((relation) => {
-								return (
-									<div class="ref">
-										<Link href={`/memo/${relation?.relatedMemoId}`}>
-											{relation?.title}
-										</Link>
-									</div>
-								);
-							})}
-						</div>
+
+							{
+								data.memo.relationList.map(async (relation) => {
+									const relId = relation?.relatedMemoId === data.memo?.id ? relation.memoId : relation.relatedMemoId;
+									
+									Astro.props.id = relId ?? "";
+									const relMemo = await(GlobalCache.getInstance().getMemo(astro));
+									
+									const title = relMemo.memo?.title ?? "Unknown";
+								
+									return (
+										<div class="ref">
+											<Link href={`/memo/${relId}`}>
+												{title}
+											</Link>
+										</div>
+									);
+								})
+							}
+
+							{
+								data.memo && 
+								<Backlinks 
+									doc={data.memo} 
+									showDivider={data.memo.relationList.length === 0 && data.memo.resourceList.length === 0} 
+									/>
+							}
+						
+							</div>
 					) : (<></>)
 					
 				}
 
-				{data.memo && <Backlinks doc={data.memo} showDivider={data.relations?.length === 0 && data.memo.resourceList.length === 0} />}
 		</article>
 	</main>
 </BaseLayout>
@@ -197,7 +224,7 @@ const localDateOptionsMobile: Intl.DateTimeFormatOptions = {
 		}
 	}
 
-	.ref {
+	:global(.ref) {
 		font-size: calc(0.8 * var(--font-size-paragraph));
 		padding-left: var(--space-4);
 	}

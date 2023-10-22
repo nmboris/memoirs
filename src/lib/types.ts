@@ -22,7 +22,6 @@ export interface MemosHost {
 export interface GlobalCacheMemoResult {
 	cacheHit: boolean;
 	memo: MemoWithMeta | null;
-	relations: ResolvedRelation[];
 	error: Error | null;
 }
 
@@ -74,10 +73,6 @@ export interface Relation {
 	memoId: number;
 	relatedMemoId: number;
 	type: RelationType;
-}
-
-export interface ResolvedRelation extends Relation {
-	title: string;
 }
 
 export type RowStatus = "NORMAL" | "ARCHIVED";
